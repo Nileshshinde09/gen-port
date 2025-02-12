@@ -1,0 +1,77 @@
+version: "3.10"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    image: frontend:latest
+    ports:
+      - 5173:8080
+    networks:
+      - project_network
+    depends_on:
+      - server
+      - backend
+    volumes:
+      - ./client:/app/client
+
+  admin:
+    build:
+      context: .
+      dockerfile: admin/Dockerfile
+    image: frontend:latest
+    ports:
+      - 5174:8080
+    networks:
+      - project_network
+    depends_on:
+      - server
+      - backend
+    volumes:
+      - ./admin:/app/admin
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    image: server:latest
+    ports:
+      - 3000:8000
+    networks:
+      - project_network
+    depends_on:
+      - mongodb
+    environment:
+      - CORS_ORIGIN=*
+      - PORT=8000
+      - MONGO_CONNECTION_URL=mongodb://mongodb:27017/Book_Review_Platform_DB
+      - GLOBAL_API_RATELIMITER_REQUEST_COUNT=5000
+      - DATABASE_NAME=Book_Review_Platform_DB
+      - ACCESS_TOKEN_SECRET=XggY1tbbIikYRZdrzwe9TqV31SyjxPxcy09YVc1Kg5Za5puU3jR09ROFYpChVQCwJFi4E6WuIGwYSgkpQ72VvKdP9EycyJh12jwE
+      - ACCESS_TOKEN_EXPIRY=1d
+      - REFRESH_TOKEN_SECRET=BMFaYH5hNdtFreQvMjPRqUwnPyrcIodqyueOI2pdyVaq40PN2o2DY5MnUHCQGVqaCgX8xyRO1hi6nSsPMBws9OYoxE2hWIUaCXmw
+      - REFRESH_TOKEN_EXPIRY=7d
+      - ADMIN_EMAILS=nileshshindeofficial@gmail.com,nilesh@gmail.com 
+
+  
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27017:27017
+    networks:
+      - project_network
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpassword
+      - MONGO_INITDB_DATABASE=Book_Review_Platform_DB
+
+volumes:
+  mongodb_data:
+
+networks:
+  project_network:
