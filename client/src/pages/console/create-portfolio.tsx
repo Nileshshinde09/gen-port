@@ -1,4 +1,4 @@
-import DefaultPortfolios from "@/app/default";
+import DefaultPortfolios from "@/www/app/default";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { House, PanelsTopLeft } from "lucide-react";
-import { motion, useDragControls } from "motion/react";
+import { motion } from "motion/react";
 import { useRef } from "react";
 import { FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -24,10 +24,9 @@ const Portfolio = ({
     return colors[index % colors.length];
   };
 
-  const controls = useDragControls();
   const containerRef = useRef<HTMLDivElement>(null); // Reference to the container
   const arr = [
-    "#e5cc78",
+"#e5cc78",
     "#b6f36b",
     "#464454",
     "#84dfe3",
@@ -45,17 +44,19 @@ const Portfolio = ({
   };
   if (portfolio_type === "default")
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Account {portfolio_type}</CardTitle>
-          <CardDescription>
-            Make changes to your account here. Click save when you're done.
+      <Card className="border-none shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-2xl font-bold">
+            {portfolio_type === "default" ? "Default Templates" : "Custom Portfolios"}
+          </CardTitle>
+          <CardDescription className="text-base">
+            Choose from our carefully crafted portfolio templates to get started quickly.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2 h-screen">
+        <CardContent className="space-y-2 h-[calc(100vh-12rem)]">
           <div
-            ref={containerRef} // Attach the ref to the container
-            className="flex gap-4 flex-wrap w-full mx-auto relative overflow-hidden h-full"
+            ref={containerRef}
+            className="flex gap-6 flex-wrap w-full mx-auto relative overflow-hidden h-full p-4"
           >
             {Object.keys(DefaultPortfolios).map((key, index) => {
               const sequentialColor = getSequentialColor(index, arr);
@@ -64,34 +65,36 @@ const Portfolio = ({
                   drag
                   dragListener={true}
                   dragConstraints={containerRef}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   style={{
                     backgroundColor: sequentialColor,
                     touchAction: "none",
                   }}
-                  className="relative flex items-center justify-center  cursor-pointer border-border border h-[16rem] w-[15rem] rounded-[2.7rem]"
+                  className="relative flex flex-col items-center justify-center cursor-pointer 
+                            border-border border h-[18rem] w-[16rem] rounded-2xl shadow-md
+                            transition-shadow hover:shadow-xl"
                   key={index}
                 >
                   <div
-                    onClick={() => {
-                      handleNavDefautlPort(
-                        `/striver/${key}?demo=true`
-                      );
-                    }}
-                    className="absolute bg-black/10 right-3 top-3 flex justify-center items-center w-10 h-10 rounded-lg "
+                    onClick={() => handleNavDefautlPort(`/striver/${key}?demo=true`)}
+                    className="absolute bg-white/20 backdrop-blur-sm right-4 top-4 
+                              flex justify-center items-center w-11 h-11 rounded-xl
+                              transition-all hover:bg-white/30"
                   >
-                    <FiUpload size={20} className="text-white" />
+                    <FiUpload size={22} className="text-white" />
                   </div>
                   <motion.img
                     src="/31.png"
-                    className="h-[12rem] w-[12rem] rounded-full"
+                    className="h-[10rem] w-[10rem] rounded-full shadow-lg"
                     animate={{ rotate: 360 }}
                     transition={{
                       repeat: Infinity,
-                      duration: 6,
+                      duration: 8,
                       ease: "linear",
                     }}
                   />
-                  <h2 className="absolute bottom-1 text-black font-semibold">
+                  <h2 className="absolute bottom-6 text-white font-semibold text-lg tracking-wide">
                     {key}
                   </h2>
                 </motion.div>

@@ -1,131 +1,386 @@
-"use client"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { Briefcase, Edit, Plus, Trash2 } from "lucide-react"
-import { motion } from "framer-motion"
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Briefcase, CalendarIcon, Edit, Trash2, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 
-interface Job {
-  title: string
-  company: string
-  period: string
-  responsibilities: string[]
+const initialExperience = [
+  {
+    company: "Example Co",
+    position: "Software Engineer",
+    startDate: "2022-01-01",
+    endDate: "2023-01-01",
+    currentlyWorking: false,
+    description: "Worked on building amazing apps.",
+  },
+  {
+    company: "Tech Inc",
+    position: "Frontend Developer",
+    startDate: "2021-01-01",
+    endDate: null,
+    currentlyWorking: true,
+    description: "Focused on developing user interfaces.",
+  },
+];
+const experienceSchema = z.object({
+  experiences: z.array(
+    z.object({
+      company: z.string().nonempty("Company name is required"),
+      position: z.string().nonempty("Position is required"),
+      startDate: z.string().nonempty("Start date is required"),
+      endDate: z.string().nullable(),
+      currentlyWorking: z.boolean().default(false),
+      description: z.string().nonempty("Description is required"),
+    })
+  ),
+});
+
+type ExperienceFormValues = z.infer<typeof experienceSchema>;
+
+
+const MotionCard = motion(Card);
+
+function DatePickerField({ date, onSelect, disabled }: {
+  date?: Date;
+  onSelect: (date: Date | undefined) => void;
+  disabled?: (date: Date) => boolean;
+}) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant={"outline"}
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            !date && "text-muted-foreground"
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, "PPP") : <span>Pick a date</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={onSelect}
+          disabled={disabled}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  );
 }
 
-interface ExperienceProps {
-  initialExperience: Job[]
+function formatDate(dateString: string | null): string {
+  if (!dateString) return '';
+  return format(new Date(dateString), 'MMM yyyy');
 }
 
-export function Experience({ initialExperience }: ExperienceProps) {
-  const [experience, setExperience] = useState(initialExperience)
+export function Experience() {
+  const [isEditPanelOpen, setIsEditPanelOpen] = useState<boolean>(false);
 
-  const MotionCard = motion(Card)
+  const form = useForm<ExperienceFormValues>({
+    resolver: zodResolver(experienceSchema),
+    defaultValues: {
+      experiences: initialExperience,
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "experiences",
+  });
+
+  const handleClosePanel = () => {
+    form.reset();
+    setIsEditPanelOpen(false);
+  };
+
+  const handleSubmit = (data: ExperienceFormValues) => {
+    try {
+      const formattedData = {
+        experiences: data.experiences.map((exp) => ({
+          ...exp,
+          startDate: new Date(exp.startDate).toISOString(),
+          endDate: exp.currentlyWorking
+            ? null
+            : exp.endDate
+            ? new Date(exp.endDate).toISOString()
+            : null,
+        })),
+      };
+      console.log('Saving experience:', formattedData);
+      setIsEditPanelOpen(false);
+    } catch (error) {
+      console.error('Error saving experience:', error);
+    }
+  };
+
+  const CurrentlyWorkingField = ({ index }: { index: number }) => (
+    <FormField
+      control={form.control}
+      name={`experiences.${index}.currentlyWorking`}
+      render={({ field }) => (
+        <FormItem className="flex flex-row items-center space-x-2">
+          <FormControl>
+            <input
+              type="checkbox"
+              checked={field.value}
+              onChange={(e) => {
+                field.onChange(e.target.checked);
+                if (e.target.checked) {
+                  form.setValue(`experiences.${index}.endDate`, null);
+                }
+              }}
+            />
+          </FormControl>
+          <FormLabel className="!mt-0">Currently working here</FormLabel>
+        </FormItem>
+      )}
+    />
+  );
 
   return (
-    <MotionCard
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-2xl font-bold">Experience</CardTitle>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <Edit className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-3xl">
-            <DialogHeader>
-              <DialogTitle>Edit Experience</DialogTitle>
-              <DialogDescription>Update your work experience here.</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              {experience.map((job, index) => (
-                <Card key={index}>
-                  <CardHeader>
-                    <div className="flex justify-between">
-                      <CardTitle>{job.title}</CardTitle>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => setExperience(experience.filter((_, i) => i !== index))}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <CardDescription>
-                      {job.company} | {job.period}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Textarea
-                      value={job.responsibilities.join("\n")}
-                      onChange={(e) => {
-                        const newExperience = [...experience]
-                        newExperience[index].responsibilities = e.target.value.split("\n")
-                        setExperience(newExperience)
-                      }}
-                      rows={3}
+    <Card>
+      {isEditPanelOpen ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-6 p-5 relative"
+            >
+              <X 
+                onClick={handleClosePanel}
+                className="absolute right-5 cursor-pointer hover:text-destructive transition-colors"
+              />
+              {fields.map((field, index) => (
+                <div key={field.id} className="space-y-6 p-4 border rounded-lg">
+                  <FormField
+                    control={form.control}
+                    name={`experiences.${index}.company`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter company name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`experiences.${index}.position`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Position</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter position title" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name={`experiences.${index}.startDate`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Start Date</FormLabel>
+                          <FormControl>
+                            <DatePickerField
+                              date={field.value ? new Date(field.value) : undefined}
+                              onSelect={(date) => field.onChange(date?.toISOString() || "")}
+                              disabled={(date) =>
+                                date > new Date() || date < new Date("1900-01-01")
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </CardContent>
-                </Card>
+
+                    {!form.watch(`experiences.${index}.currentlyWorking`) && (
+                      <FormField
+                        control={form.control}
+                        name={`experiences.${index}.endDate`}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>End Date</FormLabel>
+                            <FormControl>
+                              <DatePickerField
+                                date={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => field.onChange(date?.toISOString() || "")}
+                                disabled={(date) =>
+                                  date < new Date(form.getValues(`experiences.${index}.startDate`)) ||
+                                  date > new Date()
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  <CurrentlyWorkingField index={index} />
+
+                  <FormField
+                    control={form.control}
+                    name={`experiences.${index}.description`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Describe your role and responsibilities"
+                            className="resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => remove(index)}
+                    className="mt-2 text-destructive hover:text-destructive/90"
+                  >
+                    <Trash2 className="h-5 w-5 mr-2" />
+                    Remove Experience
+                  </Button>
+                </div>
               ))}
               <Button
+                type="button"
                 onClick={() =>
-                  setExperience([...experience, { title: "", company: "", period: "", responsibilities: [] }])
+                  append({
+                    company: "",
+                    position: "",
+                    startDate: "",
+                    endDate: null,
+                    currentlyWorking: false,
+                    description: "",
+                  })
                 }
               >
-                <Plus className="h-4 w-4 mr-2" /> Add Experience
+                Add Experience
               </Button>
+              <Button type="submit" className="w-full">
+                Save Experience
+              </Button>
+            </form>
+          </Form>
+        </motion.div>
+      ) : (
+        <MotionCard
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div className="flex items-center gap-2">
+              <Briefcase className="h-5 w-5 text-primary" />
+              <CardTitle className="text-2xl font-bold">Experience</CardTitle>
             </div>
-            <DialogFooter>
-              <Button type="submit">Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {experience.map((job, index) => (
-            <div key={index} className="flex">
-              <div className="flex flex-col items-center mr-4">
-                <div
-                  className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                    index === 0 ? "border-primary" : "border-muted"
-                  }`}
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditPanelOpen(true)}
+              className="hover:bg-primary/10"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Experience
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-8">
+              {form.getValues("experiences").map((job, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex"
                 >
-                  <Briefcase className={`h-5 w-5 ${index === 0 ? "text-primary" : "text-muted-foreground"}`} />
-                </div>
-                {index !== experience.length - 1 && <div className="w-px h-full bg-border"></div>}
-              </div>
-              <div className={index !== experience.length - 1 ? "pb-6" : ""}>
-                <h3 className="text-lg font-semibold">{job.title}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {job.company} | {job.period}
-                </p>
-                <ul className="mt-2 list-disc list-inside text-sm text-muted-foreground">
-                  {job.responsibilities.map((resp, i) => (
-                    <li key={i}>{resp}</li>
-                  ))}
-                </ul>
-              </div>
+                  <div className="flex flex-col items-center mr-6">
+                    <div
+                      className={cn(
+                        "flex items-center justify-center w-12 h-12 rounded-full border-2 transition-colors",
+                        index === 0 ? "border-primary bg-primary/10" : "border-muted bg-muted/50"
+                      )}
+                    >
+                      <Briefcase
+                        className={cn(
+                          "h-6 w-6",
+                          index === 0 ? "text-primary" : "text-muted-foreground"
+                        )}
+                      />
+                    </div>
+                    {index !== form.getValues("experiences").length - 1 && (
+                      <div className="w-px h-full bg-border"></div>
+                    )}
+                  </div>
+                  <div className={cn(
+                    "flex-1",
+                    index !== form.getValues("experiences").length - 1 ? "pb-8" : ""
+                  )}>
+                    <h3 className="text-xl font-semibold text-primary">{job.position}</h3>
+                    <p className="text-base font-medium">{job.company}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {formatDate(job.startDate)} -{" "}
+                      {job.currentlyWorking ? "Present" : formatDate(job.endDate)}
+                    </p>
+                    <p className="mt-3 text-sm leading-relaxed">{job.description}</p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </MotionCard>
-  )
+          </CardContent>
+        </MotionCard>
+      )}
+    </Card>
+  );
 }
-

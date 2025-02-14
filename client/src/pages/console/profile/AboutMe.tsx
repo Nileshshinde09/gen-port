@@ -1,8 +1,6 @@
-"use client"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -11,50 +9,105 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { Edit } from "lucide-react"
-import { motion } from "framer-motion"
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Edit } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface AboutMeProps {
-  initialAboutMe: string
+  initialAboutMe: string;
 }
 
-export function AboutMe({ initialAboutMe }: AboutMeProps) {
-  const [aboutMe, setAboutMe] = useState(initialAboutMe)
+const bioSchema = z.object({
+  bio: z
+    .string()
+    .min(1, "About/bio required")
+    .max(400, "The length of About/bio must be under 400 characters."),
+});
 
-  const MotionCard = motion(Card)
+type BioFormValues = z.infer<typeof bioSchema>;
+
+export function AboutMe({ initialAboutMe }: AboutMeProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [bio, setBio] = useState(initialAboutMe);
+
+  const form = useForm<BioFormValues>({
+    resolver: zodResolver(bioSchema),
+    defaultValues: {
+      bio: initialAboutMe,
+    },
+  });
+
+  const onSubmit: SubmitHandler<BioFormValues> = (data) => {
+    setBio(data.bio);
+    setIsEditing(false);
+  };
+
+  const MotionCard = motion(Card);
+
+  if (isEditing) {
+    return (
+      <MotionCard>
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Edit About Me</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Hi, I'm..."
+                        className="min-h-[120px]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">Save changes</Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </MotionCard>
+    );
+  }
 
   return (
     <MotionCard
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
+      transition={{ duration: 0.5 }}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold">About Me</CardTitle>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <Edit className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit About Me</DialogTitle>
-              <DialogDescription>Update your personal statement here.</DialogDescription>
-            </DialogHeader>
-            <Textarea value={aboutMe} onChange={(e) => setAboutMe(e.target.value)} rows={5} />
-            <DialogFooter>
-              <Button type="submit">Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
+          <Edit className="h-4 w-4" />
+        </Button>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground">{aboutMe}</p>
+        <p className="text-muted-foreground whitespace-pre-wrap">{bio}</p>
       </CardContent>
     </MotionCard>
-  )
+  );
 }
-

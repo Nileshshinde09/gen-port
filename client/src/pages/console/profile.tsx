@@ -121,10 +121,7 @@ const ProfilePage = () => {
       ],
     },
   ]);
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle("dark");
-  };
+
   const MotionCard = motion(Card);
 
   return (
