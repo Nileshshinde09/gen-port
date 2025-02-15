@@ -272,6 +272,10 @@ const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({
       $or: [{ username }, { email }],
     });
+    if(!user)
+      throw new ApiError(404, "User with this email id not found!");
+
+    
     if (ADMIN_EMAILS.some((email) => email === user.email)) {
       if (!user.isAdmin) {
         await User.findByIdAndUpdate(user?._id, { isAdmin: true });
@@ -584,7 +588,6 @@ const upgradeGuestUser = asyncHandler(async (req, res) => {
 const updateProfile = asyncHandler(async (req, res) => {
   const userId = req?.user?._id;
   const updates = req.body;
-
   const updateKeys = Object.keys(updates);
   const isValidUpdate = updateKeys.every((key) =>
     PROFILE_UPDATE_KEY.includes(key)
@@ -608,16 +611,24 @@ const updateProfile = asyncHandler(async (req, res) => {
       if (!Array.isArray(updates[key])) {
         throw new ApiError(400, `${key} should be an array`);
       }
+      console.log(updates[key]);
       user[key] = updates[key];
     } else {
+      
       user[key] = updates[key];
     }
   });
 
   await user.save();
+  const resUser =await User.findById(user?._id).select("-password");
+  if (!resUser)
+    throw new ApiError(
+      401,
+      "something went wrong while fetching user information!"
+    );
   return res
     .status(200)
-    .json(new ApiResponse(200, { user }, "Profile updated successfully"));
+    .json(new ApiResponse(200, { resUser }, "Profile updated successfully"));
 });
 
 export {

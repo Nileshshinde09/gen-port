@@ -60,12 +60,17 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+    location: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     fullName: {
       type: String,
       trim: true,
       index: true,
     },
-    
+
     bio: {
       type: String,
       default: null,
@@ -100,8 +105,9 @@ const userSchema = new Schema(
         name: { type: String, required: true },
         description: { type: String },
         technologies: [{ type: String }],
-        repositoryLink: { type: String },
-        liveDemoLink: { type: String },
+        socials: [{ type: String }],
+        repositoryLink: { type: String, default: null },
+        liveDemoLink: { type: String, default: null },
       },
     ],
 

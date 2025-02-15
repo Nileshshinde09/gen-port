@@ -8,15 +8,19 @@ export const ACCESS_TOKEN_SECRET = String(process.env.ACCESS_TOKEN_SECRET);
 export const REFRESH_TOKEN_SECRET = String(process.env.REFRESH_TOKEN_SECRET);
 export const ACCESS_TOKEN_EXPIRY = String(process.env.ACCESS_TOKEN_EXPIRY);
 export const REFRESH_TOKEN_EXPIRY = String(process.env.REFRESH_TOKEN_EXPIRY);
+//----------------------------------------------------------------------------------------
 export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
-export const PORTFOLIO_ACCESS_TOKEN_SECRET = String(process.env.PORTFOLIO_ACCESS_TOKEN_SECRET)
-export const PORTFOLIO_ACCESS_TOKEN_EXPIRY = String(process.env.PORTFOLIO_ACCESS_TOKEN_EXPIRY)
-
-
-
   .split(",")
   .map((val) => val.trim())
   .filter((val) => val !== "");
+//----------------------------------------------------------------------------------------
+
+export const PORTFOLIO_ACCESS_TOKEN_SECRET = String(
+  process.env.PORTFOLIO_ACCESS_TOKEN_SECRET
+);
+export const PORTFOLIO_ACCESS_TOKEN_EXPIRY = String(
+  process.env.PORTFOLIO_ACCESS_TOKEN_EXPIRY
+);
 
 // -----------Image Converter Values--------------------------------------------------------------
 
@@ -72,9 +76,28 @@ export const PROFILE_UPDATE_KEY_ENUM = Object.freeze({
   GENDER: "gender",
   DESIGNATION: "designation",
   BIO: "bio",
+  LOCATION:"location",
   EDUCATION: "education",
   EXPERIENCE: "experience",
   PROJECTS: "projects",
   SKILLS: "skills",
 });
 export const PROFILE_UPDATE_KEY = Object.values(PROFILE_UPDATE_KEY_ENUM);
+
+//------------------------------------------------------------------------------------
+export const REQUIRED_VISIBLE_FIELDS_ENUM = Object.freeze({
+    ID:"_id",
+    USERNAME:"username",
+    EMAIL:"email",
+    AVATAR:"avatar",
+    DESIGNATION:"designation",
+    LOCATION:"location",
+    FULLNAME:"fullName",
+    BIO:"bio",
+    SKILLS:"skills",
+    EDUCATION:"education",
+    EXPERIENCE:"experience",
+    PROJECTS:"projects"
+
+})
+export const REQUIRED_VISIBLE_FIELDS=Object.values(REQUIRED_VISIBLE_FIELDS_ENUM);

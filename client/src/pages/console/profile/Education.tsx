@@ -13,6 +13,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Edit, GraduationCap, Plus, Trash2, X } from "lucide-react";
@@ -21,6 +22,15 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAppSelector } from "@/store/hooks";
+import { Skeleton } from "@/components/ui/skeleton"
+import { Auth } from "@/services";
+import { toast } from "@/hooks/use-toast";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
 const educationSchema = z.object({
   education: z.array(
@@ -28,33 +38,52 @@ const educationSchema = z.object({
       institution: z.string().min(1, "Institution is required"),
       degree: z.string().min(1, "Degree is required"),
       fieldOfStudy: z.string().min(1, "Field of study is required"),
-      startDate: z.string().min(1, "Start date is required"),
-      endDate: z.string().optional(),
-      currentlyStudying: z.boolean(),
+      startDate: z.date({
+        required_error: "Start date is required",
+      }),
+      endDate: z.date().optional().nullable(),
+      currentlyStudying: z.boolean().default(false),
     })
   ),
 });
 
 type EducationFormValues = z.infer<typeof educationSchema>;
 
-interface EducationProps {
-  initialEducation: {
-    institution: string;
-    degree: string;
-    fieldOfStudy: string;
-    startDate: string;
-    endDate?: string;
-    currentlyStudying: boolean;
-  }[];
+const LoadingSkeleton = () => {
+  return (
+    <div className="space-y-4">
+      {/* User Profile Header Skeleton */}
+      <div className="flex items-center space-x-4">
+        <Skeleton className="h-12 w-12 rounded-full" /> {/* Avatar */}
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[200px]" /> {/* Name */}
+          <Skeleton className="h-4 w-[150px]" /> {/* Email/subtitle */}
+        </div>
+      </div>
+
+      {/* Content Skeleton */}
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+      </div>
+    </div>
+  )
 }
 
-export function Education({ initialEducation }: EducationProps) {
+export function Education() {
   const [open, setOpen] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const user = useAppSelector((state: any) => state.user.userData);
   const form = useForm<EducationFormValues>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      education: initialEducation,
+      education: user?.education?.map((edu: any) => ({
+        ...edu,
+        startDate: edu.startDate ? new Date(edu.startDate) : new Date(),
+        endDate: edu.endDate ? new Date(edu.endDate) : null,
+        currentlyStudying: edu.currentlyStudying || false,
+      })) || [],
     },
   });
 
@@ -65,9 +94,38 @@ export function Education({ initialEducation }: EducationProps) {
 
   const MotionCard = motion(Card);
 
-  const handleSubmit = (values: EducationFormValues) => {
-    console.log("Updated Education Data:", values);
-    setOpen(false);
+  const handleSubmit = async (values: EducationFormValues) => {
+    try {
+      setIsLoading(true);
+      
+      const formattedEducation = values.education.map(edu => ({
+        ...edu,
+        startDate: edu.startDate.toISOString(),
+        endDate: edu.currentlyStudying ? null : edu.endDate ? edu.endDate.toISOString() : null,
+      }));
+
+      const response = await Auth.updateProfile({
+        education: formattedEducation,
+      });
+
+      if (response?.status === 200) {
+        toast({
+          title: "Success",
+          description: "Education details updated successfully",
+        });
+        setOpen(false);
+      } else {
+        throw new Error("Failed to update education details");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update education details. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -87,23 +145,34 @@ export function Education({ initialEducation }: EducationProps) {
             <Edit className="h-4 w-4 " />
           </Button>
           <CardContent>
-            <div className="space-y-4">
-              {form.getValues("education").map((edu, index) => (
-                <div key={index}>
-                  <div className="flex items-center">
-                    <GraduationCap className="mr-2 h-5 w-5 text-primary" />
-                    <h3 className="font-semibold text-lg">{edu.degree}</h3>
+            {!user?.education || user.education.length === 0 ? (
+              <div className="flex items-center text-muted-foreground">
+                <GraduationCap className="mr-2 h-5 w-5" />
+                <p>Add educational details</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {form.getValues("education").map((edu, index) => (
+                  <div key={index}>
+                    <div className="flex items-center">
+                      <GraduationCap className="mr-2 h-5 w-5 text-primary" />
+                      <h3 className="font-semibold text-lg">{edu.degree}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground ml-7">
+                      {edu.institution}, {edu.fieldOfStudy}
+                    </p>
+                    <p className="text-sm text-muted-foreground ml-7">
+                      {format(new Date(edu.startDate), "PPP")} -{" "}
+                      {edu.currentlyStudying
+                        ? "Present"
+                        : edu.endDate
+                        ? format(new Date(edu.endDate), "PPP")
+                        : ""}
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground ml-7">
-                    {edu.institution}, {edu.fieldOfStudy}
-                  </p>
-                  <p className="text-sm text-muted-foreground ml-7">
-                    {edu.startDate?.split("T")[0]} -{" "}
-                    {edu.currentlyStudying ? "Present" : edu.endDate?.split("T")[0]}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </>
       ) : (
@@ -193,11 +262,47 @@ export function Education({ initialEducation }: EducationProps) {
                           control={form.control}
                           name={`education.${index}.startDate`}
                           render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="flex flex-col">
                               <FormLabel>Start Date</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="Start Date" />
-                              </FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant={"outline"}
+                                      className={cn(
+                                        "w-full pl-3 text-left font-normal",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                    >
+                                      {field.value ? (
+                                        format(field.value, "PPP")
+                                      ) : (
+                                        <span>Pick a date</span>
+                                      )}
+                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value}
+                                    onSelect={(date) => {
+                                      field.onChange(date);
+                                      // Reset end date if start date is after it
+                                      const endDate = form.watch(`education.${index}.endDate`);
+                                      if (endDate && date && date > endDate) {
+                                        form.setValue(`education.${index}.endDate`, null);
+                                      }
+                                    }}
+                                    disabled={(date) =>
+                                      date > new Date() || date < new Date("1900-01-01")
+                                    }
+                                    initialFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
                             </FormItem>
                           )}
                         />
@@ -205,11 +310,52 @@ export function Education({ initialEducation }: EducationProps) {
                           control={form.control}
                           name={`education.${index}.endDate`}
                           render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="flex flex-col">
                               <FormLabel>End Date</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="End Date" />
-                              </FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant={"outline"}
+                                      className={cn(
+                                        "w-full pl-3 text-left font-normal",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                      disabled={form.watch(`education.${index}.currentlyStudying`)}
+                                    >
+                                      {field.value ? (
+                                        format(field.value, "PPP")
+                                      ) : (
+                                        <span>Pick a date</span>
+                                      )}
+                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value || undefined}
+                                    onSelect={(date) => {
+                                      field.onChange(date);
+                                      if (date) {
+                                        // Uncheck currently studying when end date is selected
+                                        form.setValue(`education.${index}.currentlyStudying`, false);
+                                      }
+                                    }}
+                                    disabled={(date) => {
+                                      const startDate = form.watch(`education.${index}.startDate`);
+                                      return (
+                                        date > new Date() ||
+                                        (startDate && date < startDate) ||
+                                        date < new Date("1900-01-01")
+                                      );
+                                    }}
+                                    initialFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
                             </FormItem>
                           )}
                         />
@@ -217,14 +363,18 @@ export function Education({ initialEducation }: EducationProps) {
                           control={form.control}
                           name={`education.${index}.currentlyStudying`}
                           render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="flex flex-col">
                               <FormLabel>Currently Studying</FormLabel>
                               <FormControl>
                                 <Checkbox
                                   checked={field.value}
-                                  onCheckedChange={(checkedState) =>
-                                    field.onChange(checkedState)
-                                  }
+                                  onCheckedChange={(checked) => {
+                                    field.onChange(checked);
+                                    if (checked) {
+                                      // Clear end date when currently studying is checked
+                                      form.setValue(`education.${index}.endDate`, null);
+                                    }
+                                  }}
                                 />
                               </FormControl>
                             </FormItem>
@@ -241,8 +391,8 @@ export function Education({ initialEducation }: EducationProps) {
                       institution: "",
                       degree: "",
                       fieldOfStudy: "",
-                      startDate: "",
-                      endDate: "",
+                      startDate: new Date(),
+                      endDate: null,
                       currentlyStudying: false,
                     })
                   }
@@ -250,8 +400,17 @@ export function Education({ initialEducation }: EducationProps) {
                   <Plus className="h-4 w-4 mr-2" /> Add Education
                 </Button>
               </div>
-              <div className="flex justify-end mt-4">
-                <Button type="submit">Save changes</Button>
+              <div className="flex justify-end mt-4 gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setOpen(false)}
+                  type="button"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save changes"}
+                </Button>
               </div>
             </form>
           </Form>

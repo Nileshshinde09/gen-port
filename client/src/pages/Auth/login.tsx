@@ -50,8 +50,8 @@ const Login = ({ className, ...props }: UserAuthFormProps) => {
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setIsSubmitting(true);
     try {
+      
       const response = await Auth.loginToAccount(data);
-
       if (response.status === 201) {
         toast({
           title: "Failed",

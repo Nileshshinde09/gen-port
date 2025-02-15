@@ -1,43 +1,31 @@
-import { Router} from "express";
+import { Router } from "express";
 import {
-  registerUser,
-  isAdmin,
-  loginUser,
-  logoutUser,
-  refreshAccessToken,
-  changeCurrentPassword,
-  getCurrentUser,
-  updateAccountDetails,
-  isUsernameUnique,
-  registerGuestUser,
-  upgradeGuestUser,
-} from "../controllers/user.controller.js";
+  createPortfolio,
+  getPortfolio,
+  getPublicPortfolio,
+  giveMyAllPortfolios,
+  updatePortfolio,
+  deletePortfolio
+} from "../controllers/portfolio.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { updateUserMetrics } from "../middlewares/userMetrics.middleware.js";
 import checkIfBlocked from "../middlewares/block.middleware.js";
 
 const router = Router();
 
-router.route("/current-user").get(verifyJWT,checkIfBlocked, getCurrentUser);
+// Create new portfolio (protected route)
+router.route("/").post(verifyJWT, checkIfBlocked, updateUserMetrics, createPortfolio);
 
-router.route("/signup").post(updateUserMetrics, registerUser);
+// Get all portfolios for authenticated user
+router.route("/my-portfolios").get(verifyJWT, checkIfBlocked, giveMyAllPortfolios);
 
-router.route("/guest/signup").post(updateUserMetrics, registerGuestUser)
+// Get public portfolio using ID and access token
+router.route("/public/:portfolioId/:portfolioAccessToken").get(getPublicPortfolio);
 
-router.route("/guest/upgrade").post(updateUserMetrics, upgradeGuestUser)
-
-router.route("/login").post(updateUserMetrics,checkIfBlocked ,loginUser);
-
-router.route("/refresh-token").post(checkIfBlocked,refreshAccessToken);
-
-router.route("/logout").post(verifyJWT, logoutUser);
-
-router.route("/change-password").post(verifyJWT,checkIfBlocked, updateUserMetrics, changeCurrentPassword);
-
-router.route("/update-account").post(verifyJWT,checkIfBlocked, updateUserMetrics, updateAccountDetails);
-
-router.route("/check-unique-username").get(isUsernameUnique);
-
-router.route("/check-is-admin").get(isAdmin);
+// Get, update and delete portfolio by ID (protected routes)
+router.route("/:portfolioId")
+  .get(verifyJWT, checkIfBlocked, getPortfolio)
+  .patch(verifyJWT, checkIfBlocked, updateUserMetrics, updatePortfolio)
+  .delete(verifyJWT, checkIfBlocked, updateUserMetrics, deletePortfolio);
 
 export default router;

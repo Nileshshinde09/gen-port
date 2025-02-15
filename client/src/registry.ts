@@ -1,6 +1,4 @@
-export type registryNamesType="Portfolio01"|"Portfolio02"|"Portfolio03"|"Portfolio04"|"Portfolio05"|"Portfolio06"|"Portfolio07"
-
-const registry:any ={
+const registry:any = {
   "portfolios": {
     "Portfolio01": { "id": "default-portfolio-01","version":"v.0.0.1", "style": "defulat" },
     "Portfolio02": { "id": "default-portfolio-02","version":"v.0.0.1", "style": "defulat" },
@@ -12,4 +10,4 @@ const registry:any ={
   }
 }
 
-export default registry
+export default registry;

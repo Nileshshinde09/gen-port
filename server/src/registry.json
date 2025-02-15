@@ -1,0 +1,12 @@
+{
+  "$schema": "Gen-Port",
+  "portfolios": {
+    "portfolio-01": { "id": "default-portfolio-01", "style": "defulat" },
+    "portfolio-02": { "id": "default-portfolio-02", "style": "defulat" },
+    "portfolio-03": { "id": "default-portfolio-03", "style": "defulat" },
+    "portfolio-04": { "id": "default-portfolio-04", "style": "defulat" },
+    "portfolio-05": { "id": "default-portfolio-05", "style": "defulat" },
+    "portfolio-06": { "id": "default-portfolio-06", "style": "defulat" },
+    "portfolio-07": { "id": "default-portfolio-07", "style": "defulat" }
+  }
+}

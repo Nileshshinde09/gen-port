@@ -48,6 +48,11 @@ app.use("/api/v1/user", user);
 import helpdesk from "./routes/helpdesk.routes.js";
 app.use("/api/v1/helpdesk", helpdesk);
 
+// portfolio route
+import portfolio from "./routes/portfolio.routes.js";
+app.use("/api/v1/portfolio", portfolio);
+
+
 // Apollo Server Setup
 //-------------------------------------------------------------
 // Apply Apollo Server middleware to Express

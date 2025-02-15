@@ -21,6 +21,15 @@ interface UserResponse {
     user: any;
   };
 }
+
+interface ProfileUpdatePayload {
+  education?: Array<any>;
+  experience?: Array<any>;
+  projects?: Array<any>;
+  skills?: Array<any>;
+  [key: string]: any;
+}
+
 class _Auth {
   // Signup method
   async signup({
@@ -67,6 +76,8 @@ class _Auth {
           headers: { "Content-Type": "application/json" },
         }
       );
+      console.log(response);
+      
       return response;
     } catch (error: any) {
       console.error(
@@ -178,6 +189,30 @@ class _Auth {
       throw new Error(
         error.response?.data?.message ||
           "An error occurred while upgrading the guest user."
+      );
+    }
+  }
+
+  // Update Profile method
+  async updateProfile(updates: ProfileUpdatePayload): Promise<AxiosResponse<any>> {
+    try {
+      const response = await axios.post(
+        "/api/v1/user/update-profile",
+        updates,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      console.log(response);
+      
+      return response;
+    } catch (error: any) {
+      console.error(
+        `[Update Profile Error]: ${error.response?.data?.message || error.message}`
+      );
+      throw new Error(
+        error.response?.data?.message ||
+          "An error occurred while updating profile."
       );
     }
   }

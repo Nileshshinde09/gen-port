@@ -5,9 +5,20 @@ import Cookies from "js-cookie";
 export type userDataType = {
   username: string;
   fullName: string;
-  age: string;
-  gender: boolean | null;
+  email: string;
+  bio: string;
+  designation: string;
+  location: string;
+  gender: string;
   isAdmin: boolean;
+  isGuest: boolean;
+  guestExpiresAt: string | null;
+  skills: string[];
+  projects: any[];
+  experience: any[];
+  education: any[];
+  avatar: string | null;
+  _id: string;
 };
 export interface UserState {
   userData: userDataType | null;

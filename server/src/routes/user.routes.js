@@ -11,6 +11,7 @@ import {
   isUsernameUnique,
   registerGuestUser,
   upgradeGuestUser,
+  updateProfile,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { updateUserMetrics } from "../middlewares/userMetrics.middleware.js";
@@ -29,6 +30,8 @@ router.route("/guest/upgrade").post(updateUserMetrics, upgradeGuestUser)
 router.route("/login").post(updateUserMetrics,checkIfBlocked ,loginUser);
 
 router.route("/refresh-token").post(checkIfBlocked,refreshAccessToken);
+
+router.route("/update-profile").post(verifyJWT,checkIfBlocked,updateProfile)
 
 router.route("/logout").post(verifyJWT, logoutUser);
 

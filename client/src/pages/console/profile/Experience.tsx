@@ -24,33 +24,12 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
+import { useAppSelector } from "@/store/hooks";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { Auth } from "@/services";
 
-const initialExperience = [
-  {
-    company: "Example Co",
-    position: "Software Engineer",
-    startDate: "2022-01-01",
-    endDate: "2023-01-01",
-    currentlyWorking: false,
-    description: "Worked on building amazing apps.",
-  },
-  {
-    company: "Tech Inc",
-    position: "Frontend Developer",
-    startDate: "2021-01-01",
-    endDate: null,
-    currentlyWorking: true,
-    description: "Focused on developing user interfaces.",
-  },
-];
+
 const experienceSchema = z.object({
   experiences: z.array(
     z.object({
@@ -67,13 +46,15 @@ const experienceSchema = z.object({
 type ExperienceFormValues = z.infer<typeof experienceSchema>;
 
 
-const MotionCard = motion(Card);
+const MotionCard = motion.create(Card);
 
 function DatePickerField({ date, onSelect, disabled }: {
   date?: Date;
   onSelect: (date: Date | undefined) => void;
   disabled?: (date: Date) => boolean;
 }) {
+
+  const user = useAppSelector((state: any) => state.user.userData);
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -108,11 +89,14 @@ function formatDate(dateString: string | null): string {
 
 export function Experience() {
   const [isEditPanelOpen, setIsEditPanelOpen] = useState<boolean>(false);
+  const user = useAppSelector((state: any) => state.user.userData);
+  const isLoading = useAppSelector((state: any) => state.user.isLoading);
+  const { toast } = useToast();
 
   const form = useForm<ExperienceFormValues>({
     resolver: zodResolver(experienceSchema),
     defaultValues: {
-      experiences: initialExperience,
+      experiences: user?.experience || [],
     },
   });
 
@@ -126,7 +110,7 @@ export function Experience() {
     setIsEditPanelOpen(false);
   };
 
-  const handleSubmit = (data: ExperienceFormValues) => {
+  const handleSubmit = async (data: ExperienceFormValues) => {
     try {
       const formattedData = {
         experiences: data.experiences.map((exp) => ({
@@ -139,10 +123,28 @@ export function Experience() {
             : null,
         })),
       };
-      console.log('Saving experience:', formattedData);
-      setIsEditPanelOpen(false);
+
+      const response = await Auth.updateProfile({
+        experience: formattedData.experiences,
+      });
+
+      if (response?.status === 200) {
+        toast({
+          title: "Success",
+          description: "Experience updated successfully",
+        });
+        setIsEditPanelOpen(false);
+      } else {
+        throw new Error("Failed to update experience");
+      }
     } catch (error) {
       console.error('Error saving experience:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update experience. Please try again.",
+        variant: "destructive",
+      });
+      // Keep the panel open if there's an error
     }
   };
 
@@ -169,6 +171,57 @@ export function Experience() {
       )}
     />
   );
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-5 w-5" />
+            <Skeleton className="h-8 w-32" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-8">
+            {[1, 2].map((_, index) => (
+              <div key={index} className="flex">
+                <div className="mr-6">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-6 w-48" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!user?.experience || user.experience.length === 0) {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-2">
+            <Briefcase className="h-5 w-5 text-primary" />
+            <CardTitle className="text-2xl font-bold">Experience</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center py-8">
+          <Briefcase className="h-12 w-12 text-muted-foreground mb-4" />
+          <p className="text-muted-foreground mb-4">No experience added yet</p>
+          <Button onClick={() => setIsEditPanelOpen(true)}>
+            <Edit className="h-4 w-4 mr-2" />
+            Add Experience
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
