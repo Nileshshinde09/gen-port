@@ -1,4 +1,5 @@
-import { Flower, QrCode } from "lucide-react";
+import { RiAiGenerate } from "react-icons/ri";
+import { Flower } from "lucide-react";
 import { cn, Utils } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useTheme } from "./ui/theme-provider";
@@ -9,19 +10,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useNavigate } from "react-router-dom";
+import { logout } from "@/store/slices/userSlice";
 const _NavigationMenu = () => {
   const router = useNavigate();
   const { isNavVisible, isNavBody } = useAppSelector((state) => state.theme);
   const { AuthState } = useAppSelector((state) => state.user);
-
+const dispatch = useAppDispatch();
   if (!isNavVisible) return;
   const handleNav = (url: string) => {
     router(url);
   };
   const handleLogout=()=>{
-
+    dispatch(logout())
   }
   return (
     <motion.nav
@@ -34,7 +36,7 @@ const _NavigationMenu = () => {
       )}
     >
       <div>
-        <h1 className="font-thin text-2xl">GenPort.</h1>
+        <h1 className="font-thin text-2xl flex gap-2 items-center "><RiAiGenerate size={30}/><span>GenPort.</span> </h1>
       </div>
       {!AuthState ? (
         <div className="flex gap-2">

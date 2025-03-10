@@ -76,3 +76,10 @@ export const adminMiddleware = async (context) => {
   }
   return context;
 };
+
+export const isAdminMiddleware = asyncHandler(async (req,_,next) => {
+  const userId = req?.user?._id;
+  const isAdmin = await User.findById(userId).select("isAdmin");
+  if(!isAdmin) throw new ApiError(401, "Access denied, Only Admin can access!");
+ next();
+ })

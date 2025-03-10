@@ -29,8 +29,7 @@ interface LoginFormInputs {
   password: string;
 }
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
-const Login = ({ className, ...props }: UserAuthFormProps) => {
+const Login = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const dispatch = useDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,6 +48,7 @@ const Login = ({ className, ...props }: UserAuthFormProps) => {
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setIsSubmitting(true);
+    setIsLoading(true)
     try {
       
       const response = await Auth.loginToAccount(data);
@@ -66,6 +66,7 @@ const Login = ({ className, ...props }: UserAuthFormProps) => {
         });
         dispatch(login(response.data.data.user));
       }
+      setIsLoading(false)
     } catch (error: unknown) {
       const axiosError = error as {
         response?: { data?: { message?: string } };
@@ -118,7 +119,7 @@ const Login = ({ className, ...props }: UserAuthFormProps) => {
                     )}
                   />
                 </div>
-                <div className="grid gap-2">
+                <div className="grid gap-2"> 
                   <div className="flex items-center">
                     <Label
                       htmlFor="password"
@@ -127,7 +128,7 @@ const Login = ({ className, ...props }: UserAuthFormProps) => {
                       Password
                     </Label>
                     <Link
-                      to="/forgot-password"
+                      to="/send-forgot-password-mail"
                       className="text-black dark:text-white ml-auto inline-block text-sm underline"
                     >
                       Forgot your password?
@@ -167,7 +168,7 @@ const Login = ({ className, ...props }: UserAuthFormProps) => {
               </div>
               <div className="mt-4 text-center text-sm text-black dark:text-white">
                 Don&apos;t have an account?{" "}
-                <Link to="/signup" className="underline">
+                <Link to="/sign-up" className="underline">
                   Sign up
                 </Link>
               </div>

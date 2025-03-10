@@ -25,7 +25,7 @@ const ProtectedAuthLayout: React.FC<ProtectedAuthLayoutProps> = ({
     } else {
       // Redirect authenticated user to the intended page (not login page)
       if (authStatus) {
-        const redirectTo = location.state?.from?.pathname || "/dashboard/users/all-users";
+        const redirectTo = "/dashboard/all-users";
         if (location.pathname !== redirectTo) {
           navigate(redirectTo);
         }

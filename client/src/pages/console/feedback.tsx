@@ -1,161 +1,196 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormControl,
-  FormMessage,
-} from "../../components/ui/form";
-import { Textarea } from "../../components/ui/textarea";
-import { Button } from "../../components/ui/button";
-import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
-import { RiStarFill } from "@remixicon/react";
-import { useId, useState } from "react";
+import { useState } from "react"
+import { Star, MessageSquareHeart, Loader2, Send } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/hooks/use-toast"
+import { Toaster } from "@/components/ui/toaster"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
+import { HelpDesk } from "@/services"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+
+// Define the Zod schema
 const feedbackSchema = z.object({
   rating: z
-    .number()
-    .min(1, { message: "Rating must be at least 1." })
-    .max(5, { message: "Rating cannot be more than 5." }),
-  comment: z
-    .string()
-    .min(6, { message: "Comment must be at least 6 characters long." }),
-});
+    .number({ required_error: "Please select a rating." })
+    .min(1, "Rating must be between 1 and 5.")
+    .max(5, "Rating must be between 1 and 5."),
+  blogContent: z.string(),
+})
 
-const Feedback = () => {
-  const form = useForm({
+type FeedbackFormValues = z.infer<typeof feedbackSchema>
+
+export default function FeedbackPage() {
+  const [rating, setRating] = useState<number | undefined>(undefined)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [hoverRating, setHoverRating] = useState<number | undefined>(undefined)
+  const { toast } = useToast()
+
+  // Initialize React Hook Form with Zod resolver
+  const form = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
-      rating: 0,
-      comment: "",
+      rating: undefined,
+      blogContent: "",
     },
-  });
+  })
 
-  const onSubmit =async (data: z.infer<typeof feedbackSchema>) => {
-    console.log('====================================');
-    console.log(data);
-    console.log('====================================');
-  };
+  const handleSubmit = async (data: FeedbackFormValues) => {
+    setIsSubmitting(true)
+    try {
+      const response = await HelpDesk.sendFeedback({
+        comment: data.blogContent,
+        rating: data.rating,
+      })
+      if (response.status === 200) {
+        toast({
+          title: "Thank you!",
+          description: "Your feedback has been submitted successfully.",
+        })
+      }
+      setRating(undefined)
+      form.reset({ rating: undefined, blogContent: "" })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit feedback. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const getRatingLabel = (rating: number | undefined) => {
+    if (!rating) return ""
+
+    const labels = ["Poor", "Fair", "Good", "Very Good", "Excellent"]
+    return labels[rating - 1]
+  }
 
   return (
-    <>
-      <div className="h-full w-full">
-        <div className="max-w-3xl mx-auto p-4 mt-20">
-          <h1 className="relative h-24 z-10 text-lg md:text-7xl text-white text-center font-sans font-bold">
-            Share Your Thoughts!
-          </h1>
-
-          <p className="text-neutral-300/70 max-w-xl mx-auto my-2 text-sm text-center relative z-10">
-            At{" "}
-            <span className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-              Prep Next
-            </span>
-            , your feedback helps us improve and serve you better. Whether you
-            loved a recommendation, found a bug, or have a suggestion for a new
-            feature, we want to hear from you! Your input directly shapes the
-            future of our app, ensuring that we continue delivering the best
-            food recommendations tailored to your taste.
-          </p>
-
-          <div className="max-w-xl mx-auto">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4 relative"
-              >
-                {/* Rating Field */}
-                <FormField
-                  control={form.control}
-                  name="rating"
-                  render={({ field }) => (
-                    <FormItem className="h-10">
-                      <FormControl>
-                        <Ratings
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Comment Field */}
-                <FormField
-                  control={form.control}
-                  name="comment"
-                  render={({ field }) => (
-                    <FormItem className="z-10">
-                      <FormControl>
-                        <Textarea
-                          placeholder="Write your feedback..."
-                          {...field}
-                          className="rounded-lg border border-neutral-800 focus:ring-2 focus:ring-teal-500 w-full relative z-10 mt-4 bg-neutral-950 placeholder:text-neutral-700"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Submit Button */}
-                <Button type="submit" className="w-full mt-4 absolute z-10">
-                  Submit Feedback
-                </Button>
-              </form>
-            </Form>
-          </div>
+    <div className="container mx-auto py-12 px-4 max-w-3xl">
+      <div className="flex flex-col items-center mb-8 space-y-2">
+        <div className="inline-flex items-center justify-center p-2 bg-primary/10 rounded-full mb-2">
+          <MessageSquareHeart className="h-6 w-6 text-primary" />
         </div>
+        <h1 className="text-3xl font-bold tracking-tight">Your Feedback Matters</h1>
+        <p className="text-muted-foreground text-center max-w-xl">
+          Help us improve your experience by sharing your thoughts and suggestions
+        </p>
       </div>
-    </>
-  );
-};
 
-const Ratings = ({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (value: number) => void;
-}) => {
-  const id = useId();
-  const [hoverRating, setHoverRating] = useState<number | null>(null);
-  return (
-    <>
-      <RadioGroup
-        className="inline-flex gap-0 z-50 absolute left-1/2 -translate-x-1/2"
-        onValueChange={(val) => onChange(Number(val))}
-        value={String(value)}
-      >
-        {["1", "2", "3", "4", "5"].map((star) => (
-          <label
-            key={star}
-            className="group relative cursor-pointer rounded-lg p-0.5"
-            onMouseEnter={() => setHoverRating(Number(star))}
-            onMouseLeave={() => setHoverRating(null)}
-          >
-            <RadioGroupItem
-              id={`${id}-${star}`}
-              value={star}
-              className="sr-only"
-            />
-            <RiStarFill
-              size={24}
-              className={`transition-all ${
-                (hoverRating ?? value) >= Number(star)
-                  ? "text-amber-500"
-                  : "text-input"
-              } group-hover:scale-110`}
-            />
-            <span className="sr-only">
-              {star} star{star === "1" ? "" : "s"}
-            </span>
-          </label>
-        ))}
-      </RadioGroup>
-    </>
-  );
-};
+      <Card className="border shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-xl">How was your experience?</CardTitle>
+          <CardDescription>We value your opinion and use it to make our service better for you</CardDescription>
+          <Separator className="mt-2" />
+        </CardHeader>
+        <CardContent className="pt-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="rating"
+                render={({ field }) => (
+                  <FormItem className="space-y-4">
+                    <FormControl>
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="flex justify-center space-x-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onMouseEnter={() => setHoverRating(star)}
+                              onMouseLeave={() => setHoverRating(undefined)}
+                              onClick={() => {
+                                setRating(star)
+                                field.onChange(star) // Update form value
+                              }}
+                              className={`text-4xl focus:outline-none transition-all duration-200 hover:scale-110 ${
+                                (hoverRating !== undefined ? star <= hoverRating : rating && star <= rating)
+                                  ? "text-yellow-400"
+                                  : "text-gray-200"
+                              }`}
+                            >
+                              <Star
+                                fill={
+                                  (hoverRating !== undefined ? star <= hoverRating : rating && star <= rating)
+                                    ? "currentColor"
+                                    : "none"
+                                }
+                                strokeWidth={1.5}
+                                className="h-10 w-10"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                        {(rating || hoverRating) && (
+                          <div className="text-center animate-fade-in">
+                            <span className="text-lg font-medium text-primary">
+                              {getRatingLabel(hoverRating || rating)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-center" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="blogContent"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium">Additional comments (optional)</p>
+                          <p className="text-xs text-muted-foreground">{field.value?.length || 0} characters</p>
+                        </div>
+                        <Textarea
+                          placeholder="Tell us more about your experience..."
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          className="min-h-[150px] resize-none"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end">
+                <Button type="submit" className="min-w-[140px]" disabled={!rating || isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Submit Feedback
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="flex justify-center border-t py-4">
+          <p className="text-sm text-muted-foreground text-center max-w-md">
+            Your feedback helps us create a better experience for everyone. Thank you for taking the time to share your
+            thoughts.
+          </p>
+        </CardFooter>
+      </Card>
+      <Toaster />
+    </div>
+  )
+}
 
-export default Feedback;

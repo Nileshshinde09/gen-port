@@ -4,6 +4,8 @@ import { NavBar } from "./components";
 import { Auth } from "./services";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { login } from "./store/slices/userSlices";
+import { Toaster } from "./components/ui/toaster";
+
 const App = (): React.ReactElement => {
   
   const authState = useAppSelector((state) => state.user.AuthState);
@@ -23,6 +25,7 @@ const App = (): React.ReactElement => {
     <div className="w-full h-screen overflow-hidden">
       <NavBar />
       <Outlet />
+    <Toaster/>
     </div>
   );
 };

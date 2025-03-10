@@ -22,6 +22,7 @@ import { Link } from "react-router-dom";
 import { NavProjects } from "./sidebarComponents/nav-projects";
 import { NavSecondary } from "./nav-secondar";
 import { NavMain } from "./sidebarComponents/nav-main";
+import { RiAiGenerate } from "react-icons/ri";
 const data = {
   user: {
     name: "shadcn",
@@ -74,14 +75,10 @@ const data = {
       url: "/console/create-portfolio",
       icon: SiCreatereactapp,
     },
+    
     {
-      name: "Analytics",
-      url: "/console/analytics",
-      icon: SiGoogleanalytics,
-    },
-    {
-      name: "Demo",
-      url: "/console/demo-templates",
+      name: "Dashboard",
+      url: "/console/dashboard",
       icon: CgWebsite,
     }
   ],
@@ -94,15 +91,14 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="#">
+              <Link to="/">
                 <div className="flex aspect-square rounded-lg border border-border size-8 items-center justify-center text-sidebar-primary-foreground">
-                  <FaGripfire className="size-6 text-heroButton" />
+                  <RiAiGenerate size={30} className="size-6 text-heroButton" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    Prep Next {">>"}
+                  <span className="font-thin text-xl flex gap-2 items-center ">
+                    Prep Next
                   </span>
-                  <span className="truncate text-xs">Web App</span>
                 </div>
               </Link>
             </SidebarMenuButton>

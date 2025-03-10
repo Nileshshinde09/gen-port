@@ -5,6 +5,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchHandler.js";
 import jwt from "jsonwebtoken";
+import { User } from "../model/user.model.js";
 
 const generatePortfolioAccessTokens = async (portfolioId) => {
   try {
@@ -67,9 +68,9 @@ export const getPortfolio = asyncHandler(async (req, res) => {
   if (!portfolio) {
     throw new ApiError(404, "Portfolio not found");
   }
-    if(portfolio.owner.toString() !== req.user._id.toString()){
-              
-    }
+  if(portfolio.owner.toString() !== req.user._id.toString()){
+    throw new ApiError(403, "You are not authorized to access this portfolio");              
+  }
 
   res
     .status(200)
@@ -86,14 +87,83 @@ export const getPublicPortfolio = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid portfolio access token");
   }
   const portfolio = await Portfolio.findOne({ _id:token._id});
-  if(portfolio.access === PORTFOLIO_ACCESS_ENUM.PRIVATE){
-    throw new ApiError(401, "Portfolio is private");
-  }
   if (!portfolio) {
     throw new ApiError(404, "Portfolio not found");
   }
+  const project = {};
+  Object.keys(portfolio.visibleFields).forEach(key => {
+  if (portfolio.visibleFields[key] === 1 && key !== "_id") {
+    project[key] = 1; 
+  }
+});
+  const user = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(portfolio.owner)
+      }
+    },
+    {
+      $project: project
+    }
+  ]);
+
+  if(portfolio.access === PORTFOLIO_ACCESS_ENUM.PRIVATE){
+    throw new ApiError(401, "Portfolio is private");
+  }
+  
   await portfolio.incrementDailyTraffic();
-  res.status(200).json(new ApiResponse(200, { portfolio }, "Portfolio fetched successfully"));
+  
+  // Get the first (and should be only) user from aggregation result
+  const portfolioResponse = {
+    ...portfolio.toObject(),
+    user: user[0] || null
+  };
+  res.status(200).json(
+    new ApiResponse(200, { portfolio: portfolioResponse }, "Portfolio fetched successfully")
+  );
+}); 
+//----------------------------------------------------------------------------------------------------------------------------------
+export const getPortfolioPriview = asyncHandler(async (req, res) => {
+  const { _id } = req.params; 
+  if(!_id){
+    throw new ApiError(400, "Portfolio ID is required");
+  }
+  const portfolio = await Portfolio.findOne({_id});
+  if (!portfolio) {
+    throw new ApiError(404, "Portfolio not found");
+  }
+  const project = {};
+  Object.keys(portfolio.visibleFields).forEach(key => {
+  if (portfolio.visibleFields[key] === 1 && key !== "_id") {
+    project[key] = 1; 
+  }
+});
+  const user = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(portfolio.owner)
+      }
+    },
+    {
+      $project: project
+    }
+  ]);
+
+  if(portfolio.access === PORTFOLIO_ACCESS_ENUM.PRIVATE){
+    throw new ApiError(401, "Portfolio is private");
+  }
+  
+  await portfolio.incrementDailyTraffic();
+  
+  // Get the first (and should be only) user from aggregation result
+  const portfolioResponse = {
+    ...portfolio.toObject(),
+    user: user[0] || null
+  };
+
+  res.status(200).json(
+    new ApiResponse(200, { portfolio: portfolioResponse }, "Portfolio fetched successfully")
+  );
 }); 
 //----------------------------------------------------------------------------------------------------------------------------------
 
@@ -116,6 +186,7 @@ export const updatePortfolio = asyncHandler(async (req, res) => {
   if(!req.params.portfolioId){
     throw new ApiError(400, "Portfolio ID required");
   } 
+  
   const { access, isAvatarVisible, visibleFields } = req.body;
   
   const allowedUpdates = ["access", "isAvatarVisible", "visibleFields"];
@@ -124,6 +195,7 @@ export const updatePortfolio = asyncHandler(async (req, res) => {
   const isValidUpdate = Object.keys(req.body).every((key) =>
     allowedUpdates.includes(key)
   );
+
 
   if (!isValidUpdate) {
     throw new ApiError(400, "Invalid update fields");
@@ -152,11 +224,11 @@ export const updatePortfolio = asyncHandler(async (req, res) => {
   const updateData = {};
   if (access) updateData.access = access;
   if (typeof isAvatarVisible === "boolean") updateData.isAvatarVisible = isAvatarVisible;
-  if (visibleFields) updateData.visibleFileds = visibleFields;
+  if (visibleFields) updateData.visibleFields = visibleFields;
 
   const portfolio = await Portfolio.findOneAndUpdate(
     { 
-      _id: req.params.portfolioId, 
+      _id:req.params.portfolioId, 
       owner: req.user._id 
     },
     { $set: updateData },
@@ -182,14 +254,17 @@ export const deletePortfolio = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Portfolio ID required");
   }
   
-  const portfolio = await Portfolio.findOneAndDelete({ _id: req.params.portfolioId, owner: req.user._id });
+  const portfolio = await Portfolio.findById(req.params.portfolioId);
+  
+  if (!portfolio) {
+    throw new ApiError(404, "Portfolio not found");
+  }
+
   if(req.user._id.toString() !== portfolio.owner.toString()){
     throw new ApiError(403, "You are not authorized to delete this portfolio");
   }
 
-  if (!portfolio) {
-    throw new ApiError(404, "Portfolio not found");
-  }
+  await Portfolio.findByIdAndDelete(req.params.portfolioId);
 
   res
     .status(200)

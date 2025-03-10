@@ -5,6 +5,7 @@ import { Toaster } from "./components/ui/toaster";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { Auth } from "./services";
 import { login } from "./store/slices/userSlice";
+import { Toaster as SonnarToaster } from "sonner";
 const App = (): React.ReactNode => {
   const authState = useAppSelector((state) => state.user.AuthState);
   const dispatch = useAppDispatch();
@@ -24,8 +25,13 @@ const App = (): React.ReactNode => {
         <Navbar />
         <Outlet />
         <Toaster/>
+        <SonnarToaster richColors />
       </main>
   );
 };
 
 export default App;
+
+
+
+

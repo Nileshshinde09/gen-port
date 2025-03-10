@@ -4,5 +4,5 @@ import { UserMetrics } from "./userMetrics.model.js";
 import {Feedback} from "./feeback.model.js"
 import {Support} from "./support.model.js"
 import { Portfolio } from "./portfolio.model.js";
-
-export { Portfolio,User,UserActivity,UserMetrics,Feedback,Support };
+import { Images } from "./images.model.js";
+export { Portfolio,User,UserActivity,UserMetrics,Feedback,Support,Images };

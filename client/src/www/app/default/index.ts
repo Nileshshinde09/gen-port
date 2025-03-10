@@ -16,7 +16,6 @@ export {
   DefaultPortfolio06,
   DefaultPortfolio07,
 };
-
 const DefaultPortfolios: { [key: string]: [string, React.ComponentType] } = {
   Portfolio01: ["portfolio01", DefaultPortfolio01],
   Portfolio02: ["portfolio02", DefaultPortfolio02],
@@ -28,3 +27,12 @@ const DefaultPortfolios: { [key: string]: [string, React.ComponentType] } = {
 };
 
 export default DefaultPortfolios;
+export const PreviewPortfolios: { [key: string]: [string, React.ComponentType] } = {
+  Portfolio01: [ "default-portfolio-01", DefaultPortfolio01],
+  Portfolio02: [ "default-portfolio-02", DefaultPortfolio02],
+  Portfolio03: [ "default-portfolio-03", DefaultPortfolio03],
+  Portfolio04: [ "default-portfolio-04", DefaultPortfolio04],
+  Portfolio05: [ "default-portfolio-05", DefaultPortfolio05],
+  Portfolio06: [ "default-portfolio-06", DefaultPortfolio06],
+  Portfolio07: [ "default-portfolio-07", DefaultPortfolio07],
+};

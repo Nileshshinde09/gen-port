@@ -7,6 +7,7 @@ export type userDataType = {
   fullName: string;
   email: string;
   bio: string;
+  phone: string;
   designation: string;
   location: string;
   gender: string;
@@ -18,7 +19,9 @@ export type userDataType = {
   experience: any[];
   education: any[];
   avatar: string | null;
+  avatarUrl: string | null;
   _id: string;
+  isEmailVerified: boolean;
 };
 export interface UserState {
   userData: userDataType | null;
@@ -41,7 +44,12 @@ export const userSlice = createSlice({
       state.AuthState = false;
       state.userData = null;
     },
+    verifyEmail: (state, action: PayloadAction<boolean>) => {
+      if (state.userData) {
+        state.userData.isEmailVerified = action.payload;
+      }
+    },
   },
 });
-export const { login, logout } = userSlice.actions;
+export const { login, logout,verifyEmail } = userSlice.actions;
 export default userSlice.reducer;

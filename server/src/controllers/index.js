@@ -1,5 +1,8 @@
 import { healthcheck } from "./healthcheck.controller.js";
 import {
+  changeTicketState,
+  getAllFeedbacks,
+  getAllTickets,
   getFeedbackTestimonials,
   getMyTickets,
   raiseSupportTicket,
@@ -20,8 +23,10 @@ import {
   updateAccountDetails,
   upgradeGuestUser,
 } from "./user.controller.js";
-
 export {
+  changeTicketState,
+  getAllTickets,
+  getAllFeedbacks,
   registerGuestUser,
   upgradeGuestUser,
   getMyTickets,

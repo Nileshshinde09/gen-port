@@ -22,21 +22,37 @@ const Portfolio = () => {
   const handleAddPortfolio = async (isDeployed:boolean=false) => { 
     if(!metaData) return;
     const response = await PortfolioService.createPortfolio({portfolioId:metaData?.id,isDeployed});
-    if(response?.status === 200){
-      toast({
-        title: "Portfolio created successfully",
-        description: "Portfolio created successfully",
-      });
-      if(isDeployed){
-        navigate(`/portfolio/${metaData?.id}`);
+    if(isDeployed){
+      if(response?.status === 201){
+        toast({
+          title: "Deployable Portfolio created successfully",
+          description: "Deployable Portfolio created successfully",
+        });
+
+        navigate(`/docs/${response?.data?.data?.portfolio?._id}`);
+      }
+      if(response?.status !== 201){
+          toast({
+            title: "Deployable Portfolio creation failed",
+            description: "DeployablePortfolio creation failed",
+          });
       }
     }
-    if(response?.status !== 200){
-      toast({
-        title: "Portfolio creation failed",
-        description: "Portfolio creation failed",
-      });
+    if(!isDeployed){
+      if(response?.status === 201){
+        toast({
+          title: "Portfolio created successfully",
+          description: "Portfolio created successfully",
+        });
+      } 
+      if(response?.status !== 201){
+        toast({
+          title: "Portfolio creation failed",
+          description: "Portfolio creation failed",
+        });
+      }
     }
+
   };
 
   const demoValue = searchParams.get("demo");

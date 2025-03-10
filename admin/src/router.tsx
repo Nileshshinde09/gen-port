@@ -16,6 +16,8 @@ import { AuthLayout, Login } from "./pages/Auth";
 import { PageNotFound, ProtectedAuthLayout } from "./components";
 import App from "./App";
 import { AllUsers } from "./pages/Dashboard/Users";
+import SignUp from "./pages/Dashboard/Auth/register";
+import AppUserStats from "./pages/Dashboard/Stats/user-stat";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,14 +27,6 @@ const router = createBrowserRouter(
         element={
           <ProtectedAuthLayout authentication={true}>
             <PageNotFound />
-          </ProtectedAuthLayout>
-        }
-      />
-      <Route
-        path="/profile/:id"
-        element={
-          <ProtectedAuthLayout authentication={true}>
-            <Profile />
           </ProtectedAuthLayout>
         }
       />
@@ -57,6 +51,9 @@ const router = createBrowserRouter(
         }
       >
         <Route index path="all-users" element={<AllUsers />} />
+        <Route path="user-sign-up" element={<SignUp />} />
+        <Route path="profile/:userId" element={<Profile/>}/>
+        <Route path="user-stats" element={<AppUserStats />} />
         <Route path="user-feedback" element={<UserFeedback />} />
         <Route path="support-queries" element={<UserSupportQueries />} />
         <Route path="application-stats" element={<ApplicationStats />} />

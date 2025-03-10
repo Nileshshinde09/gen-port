@@ -1,3 +1,4 @@
+import registry from "@/registry";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -18,4 +19,15 @@ export const DataFormate = (value:string)=>{
 const parts=value.split("/");
 const dt=new Date(Number(parts[2]),Number(parts[1])-1,Number(parts[0]))
 return dt;
+}
+
+
+export function getPortfolioById(id: string): any {
+  const portfolios = registry.portfolios;
+  for (const key in portfolios) {
+      if (portfolios[key].id === id) {
+          return key;
+      }
+  }
+  return null; 
 }

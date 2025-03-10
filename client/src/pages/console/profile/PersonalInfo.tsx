@@ -24,16 +24,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { useAppSelector } from "@/store/hooks";
+import { Auth } from "@/services";
+import { useToast } from "@/hooks/use-toast";
+
 
 const phoneRegex = /^(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?$/;
 
 const schema = z.object({
-
-  
+  // email: z.string().email("Invalid email"),
   fullName: z.string().min(1, "Name is required"),
   designation: z.string().min(1, "Title is required"),
   location: z.string().min(1, "Location is required"),
-  email: z.string().email("Invalid email"),
   phone: z
     .string()
     .min(10, "Phone number must be at least 10 digits")
@@ -46,6 +47,7 @@ const schema = z.object({
 });
 
 export function PersonalInfo() {
+  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const user = useAppSelector((state) => state.user.userData);
@@ -55,7 +57,10 @@ export function PersonalInfo() {
     location: user?.location || '',
     email: user?.email || '',
     phone: user?.phone || '',
+    avatar: user?.avatarURL || '',
+    avatarURL: user?.avatarURL || '',
   });
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -65,6 +70,8 @@ export function PersonalInfo() {
         location: user.location || '',
         email: user.email || '',
         phone: user.phone || '',
+        avatar: user.avatarURL || '',
+        avatarURL: user.avatarURL || '',
       });
       setIsLoading(false);
     }
@@ -76,10 +83,41 @@ export function PersonalInfo() {
     mode: "onChange",
   });
 
-  const onSubmit = (data: z.infer<typeof schema>) => {
-    console.log("Saved data", data);
+  const onSubmit = async(data: any) => {
     setInfo(data);
     setIsEditing(false);
+    const response = await Auth.updateProfile(data);
+    if(response.status === 200){
+      toast({
+        title: "Profile updated successfully",
+        description: "Your profile has been updated successfully",
+      });
+      setInfo(data);
+      setIsEditing(false);
+
+
+    }else{
+      toast({
+        variant: "destructive",
+        title: "Failed to update profile",
+        description: "Please try again",
+      });
+    }
+  };
+
+  const handleAvatarChange = async(event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const response = await Auth.updateProfileImage(file);
+      if(response.status === 200){
+        toast({
+          title: "Profile image updated successfully",
+        });
+        console.log("Response", response);
+        setIsEditing(false);
+      }
+    }
   };
 
   const MotionCard = motion(Card);
@@ -137,7 +175,7 @@ export function PersonalInfo() {
           <div className="relative w-32 h-32 mx-auto mb-6 group">
             <Avatar className="w-32 h-32 border-4 border-primary/10 ring-2 ring-background group-hover:ring-primary/30 transition-all duration-300">
               <AvatarImage 
-                src={user?.avatar || "/placeholder.svg"}
+                src={avatarFile ? URL.createObjectURL(avatarFile) : (user?.avatarURL || "/placeholder.svg")}
                 alt={info.fullName}
                 className="object-cover"
               />
@@ -238,6 +276,44 @@ export function PersonalInfo() {
             ✕
           </Button>
         </div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-32 h-32 group">
+            <Avatar className="w-32 h-32 border-4 border-primary/10">
+              <AvatarImage 
+                src={avatarFile ? URL.createObjectURL(avatarFile) : (user?.avatar || "/placeholder.svg")}
+                alt={info.fullName}
+                className="object-cover"
+              />
+              <AvatarFallback className="text-3xl font-bold bg-primary/5">
+                {info.fullName ? info.fullName.split(" ").map((n) => n[0]).join("") : "?"}
+              </AvatarFallback>
+            </Avatar>
+            <label 
+              htmlFor="avatar-upload" 
+              className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              <span className="text-white text-sm font-medium">Change Photo</span>
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
+          </div>
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              setAvatarFile(null);
+            }}
+            className="text-sm"
+          >
+            Remove Photo
+          </Button>
+        </div>
         <CardDescription className="text-base">
           Update your personal information below
         </CardDescription>
@@ -285,7 +361,7 @@ export function PersonalInfo() {
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
@@ -297,7 +373,7 @@ export function PersonalInfo() {
                     <FormMessage className="text-red-500 text-xs" />
                   </FormItem>
                 )}
-              />
+              /> */}
               <FormField
                 control={form.control}
                 name="phone"

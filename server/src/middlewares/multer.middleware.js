@@ -1,19 +1,23 @@
 import multer from 'multer';
+import fs from 'fs';
 import path from 'path';
+// Define the directory first
+const tempDir = path.resolve("public/temp");
+
+// Ensure the directory exists
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb ) => {
-    const tempDir = path.resolve("public/temp");
-    cb(null, tempDir); // Callback with destination
+  destination: (req, file, cb) => {
+    cb(null, tempDir); // Set the upload destination
   },
-  filename: (reqt, file, cb) => {
-    cb(null, file.originalname); 
+  filename: (req, file, cb) => {
+    cb(null, file.originalname); // Keep original filename
   },
 });
 
-export const uploadMultiple = multer({
-  storage,
-}).array("uploadedImages");
 
 export const upload = multer({
   storage,
@@ -21,6 +25,12 @@ export const upload = multer({
     fileSize: 1 * 1000 * 1000, 
   },
 });
+
+
+
+export const uploadMultiple = multer({
+  storage,
+}).array("uploadedImages");
 
 export const uploadSingle = multer({
   storage,

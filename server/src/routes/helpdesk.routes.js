@@ -4,8 +4,14 @@ import {
   getFeedbackTestimonials,
   raiseSupportTicket,
   getMyTickets,
+  changeTicketState,
+  getAllTickets,
+  getAllFeedbacks,
 } from "../controllers/index.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import {
+  isAdminMiddleware,
+  verifyJWT,
+} from "../middlewares/auth.middleware.js";
 import checkIfBlocked from "../middlewares/block.middleware.js";
 
 const router = Router();
@@ -21,6 +27,17 @@ router
   .post(verifyJWT, checkIfBlocked, raiseSupportTicket);
 router
   .route("/s/get-my-support-tickets")
-  .post(verifyJWT, checkIfBlocked, getMyTickets);
+  .get(verifyJWT, checkIfBlocked, getMyTickets);
 
+//-------------------------------admin routes----------------------------------
+router
+  .route("/a/get-all-support-tickets")
+  .get(verifyJWT, isAdminMiddleware, getAllTickets);
+router
+  .route("/a/change-ticket-state/:ticketId")
+  .put(verifyJWT, isAdminMiddleware, changeTicketState);
+
+router
+  .route("/a/get-all-feedbacks")
+  .get(verifyJWT, isAdminMiddleware, getAllFeedbacks);
 export default router;

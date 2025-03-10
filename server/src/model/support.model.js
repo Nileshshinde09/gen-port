@@ -1,7 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { SUPPORT_ESSUE_TYPE, SUPPORT_TICKET_STATUS, SUPPORT_TICKET_STATUS_ENUM } from "../constants.js";
 
-SUPPORT_TICKET_STATUS
 
 const supportSchema = new Schema(
   {
@@ -15,9 +14,9 @@ const supportSchema = new Schema(
       required: [true, "Issue type is required"],
       enum: SUPPORT_ESSUE_TYPE,
     },
-    description: {
+    content: {
       type: String,
-      required: [true, "Description is required"],
+      required: [true, "Content is required"],
       trim: true,
     },
     status: {

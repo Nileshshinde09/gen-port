@@ -1,4 +1,3 @@
-import { init } from "./graphql/index.js";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -7,19 +6,26 @@ import requestIp from "request-ip";
 import "./jobs/cleanupGuestUsers.js"; 
 const app = express();
 
-// Middleware
-app.use(
-  cors({
-    // origin:
-    //   process.env.CORS_ORIGIN === "*"
-    //     ? "*"
-    //     : process.env.CORS_ORIGIN?.split(","),
-    origin:["http://localhost:5173","http://localhost:5174"],
-    credentials: true,
-  })
-);
-app.use((_, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173","http://localhost:5174");
+// Create a CORS middleware with your settings
+const corsMiddleware = cors({
+  origin: ["http://localhost:5173", "http://localhost:5174"],
+  credentials: true,
+});
+
+// Apply CORS to all routes except portfolio
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/v1/portfolio')) {
+    return next();
+  }
+  return corsMiddleware(req, res, next);
+});
+
+// Your custom headers middleware
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/v1/portfolio')) {
+    return next();
+  }
+  res.header("Access-Control-Allow-Origin", "http://localhost:5173", "http://localhost:5174");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
@@ -53,18 +59,5 @@ import portfolio from "./routes/portfolio.routes.js";
 app.use("/api/v1/portfolio", portfolio);
 
 
-// Apollo Server Setup
-//-------------------------------------------------------------
-// Apply Apollo Server middleware to Express
-
-init(app)
-  .then(() => {
-    console.log("Apollo Server initialized successfully");
-  })
-  .catch((err) => {
-    console.error("Error initializing Apollo Server:", err.message);
-  });
-
-//-------------------------------------------------------------
 
 export { app };

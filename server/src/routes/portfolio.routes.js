@@ -5,7 +5,8 @@ import {
   getPublicPortfolio,
   giveMyAllPortfolios,
   updatePortfolio,
-  deletePortfolio
+  deletePortfolio,
+  getPortfolioPriview
 } from "../controllers/portfolio.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { updateUserMetrics } from "../middlewares/userMetrics.middleware.js";
@@ -22,6 +23,7 @@ router.route("/my-portfolios").get(verifyJWT, checkIfBlocked, giveMyAllPortfolio
 // Get public portfolio using ID and access token
 router.route("/public/:portfolioId/:portfolioAccessToken").get(getPublicPortfolio);
 
+router.route("/preview/:_id").get(getPortfolioPriview);
 // Get, update and delete portfolio by ID (protected routes)
 router.route("/:portfolioId")
   .get(verifyJWT, checkIfBlocked, getPortfolio)

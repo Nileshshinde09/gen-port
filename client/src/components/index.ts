@@ -11,7 +11,10 @@ import AppSidebar from "./app-sidebar";
 import HomeHeader from "./Home/homeHeader";
 import { Icons } from "./icon";
 import Footer from "./Home/footer";
+import { NavUser } from "./nav-user";
+
 export {
+  NavUser,
   Footer,
   Icons,
   HomeHeader,

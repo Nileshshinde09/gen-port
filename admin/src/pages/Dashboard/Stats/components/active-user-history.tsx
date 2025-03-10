@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
@@ -27,7 +25,9 @@ import {
 } from "../../../../components/ui/select";
 import { Info } from "lucide-react";
 import { InfoDialog } from "../../../../components";
-import { useApplicationHistory } from "../../../../graphql/queries/application-user-history";
+import { Auth } from "../../../../services";
+import { Skeleton } from "../../../../components/ui/skeleton";
+import { Separator } from "../../../../components/ui/separator";
 
 const chartConfig = {
   visitors: {
@@ -40,7 +40,22 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const ActiveUserHistory = () => {
-  const { data, error, loading, setDuration } = useApplicationHistory();
+  const [duration,setDuration] = React.useState(90);
+  const [loading,setLoading] = React.useState(false);
+  const [error,setError] = React.useState<any>(null);
+  const [data,setData] = React.useState<any>(null);
+
+  React.useEffect(()=>{
+    setLoading(true);
+    ;(async()=>{
+      const response = await Auth.getAppActivityHistory({duration})
+      if(response.status===200){
+        setData(response?.data?.data?.userMetrics);
+      }
+      setLoading(false)
+    })()
+  },[duration])
+  // const { data, error, loading, setDuration } = useApplicationHistory();
   const [timeRange, setTimeRange] = React.useState("90d");
 
   // Update the duration whenever timeRange changes
@@ -54,12 +69,16 @@ const ActiveUserHistory = () => {
     }
   }, [timeRange, setDuration]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+    <Skeleton className="relative h-[20rem] w-full">
+      <Separator className="absolute w-full top-14 bg-black"/>
+    </Skeleton>
+  );
   if (error) return <div>Error: {error.message}</div>;
   if (!data) return null;
 
   // Filter the data based on the selected time range
-  const filteredData = data?.getUserActiveHistory.data.filter((item) => {
+  const filteredData = data?.filter((item:any) => {
     //@ts-ignore
     const date = new Date(item.date?.split("T")[0]);
     const referenceDate = new Date("2024-06-30");

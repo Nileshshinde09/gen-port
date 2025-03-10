@@ -1,19 +1,21 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
+
 import { ApiError } from "../utils/ApiError.js";
 import { uploadOnCloudinary, removeImageContentFromCloudinary } from "../utils/cloudinary.js";
-import { Images } from "../models/images.models.js"
+import { Images } from "../model/index.js";
 import { Schema } from "mongoose";
+import { asyncHandler } from "../utils/asynchHandler.js";
 
 const setProfileImage = asyncHandler(
     async (req, _, next) => {
         const userId = req.user?._id;
+        
         if (req?.body?.avatar) return next()
+        if (req?.body?.avatarNotSpecifiled) return next()
         if (!userId) throw new ApiError(
             400,
             "User not found , unathorised access"
         )
-
-        if (avatar) {
+        if (req?.body?.avatar) {
             return next()
         }
 
@@ -49,7 +51,8 @@ const setProfileImage = asyncHandler(
                 500,
                 "Something went wrong while storing image in database !"
             )
-            req.user.avatar = uploadedImage?._id
+            req.body.avatar = uploadedImage._id
+            req.body.avatarURL = uploadedImage.URL
             next()
         } catch (error) {
             throw new ApiError(
@@ -81,7 +84,9 @@ const removeProfileImage = asyncHandler(
                     ]
                 )
                 if (isAnoImage) {
-                    req?.body?.avatar = null
+                    if (req && req.body) {
+                        req.body.avatar = null
+                    }
                     return next()
                 }
                 const deletedImageResponse = await removeImageContentFromCloudinary(req?.body?.avatar)

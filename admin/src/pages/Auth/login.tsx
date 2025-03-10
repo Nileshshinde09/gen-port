@@ -40,9 +40,7 @@ const Login: React.FC = () => {
     setIsSubmitting(true);
     try {
       const response = await Auth.loginToAccount(data);
-      console.log('====================================');
-      console.log(response);
-      console.log('====================================');
+
       if (response.status === 201) {
         toast({
           title: "Failed",

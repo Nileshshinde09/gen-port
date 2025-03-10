@@ -26,7 +26,6 @@ const portfolioSchema = new Schema(
     portfolioId: {
       type: String,
       required: true,
-      unique: true,
     },
     portfolioAccessToken: {
       type: String,
@@ -36,7 +35,7 @@ const portfolioSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    visibleFileds: {
+    visibleFields: {
       type: Object,
       default: {
         "_id": 1,
@@ -60,8 +59,14 @@ const portfolioSchema = new Schema(
       default: PORTFOLIO_ACCESS_ENUM.PRIVATE,
     },
     dailyTraffic: {
-      type: Number,
-      default: 0,
+      date: {
+        type: Date,
+        default: new Date()
+      },
+      count: {
+        type: Number,
+        default: 0
+      }
     },
   },
   {
@@ -89,8 +94,8 @@ portfolioSchema.methods.incrementDailyTraffic = async function() {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to start of day
     
-    // Check if dailyTraffic exists and is from today
-    if (!this.dailyTraffic || this.dailyTraffic.date < today) {
+    // Check if dailyTraffic.date exists and is from today
+    if (!this.dailyTraffic.date || this.dailyTraffic.date < today) {
       // Reset for new day
       this.dailyTraffic = {
         date: today,
@@ -104,7 +109,7 @@ portfolioSchema.methods.incrementDailyTraffic = async function() {
     await this.save();
     return this.dailyTraffic.count;
   } catch (error) {
-    throw new Error("Failed to increment daily traffic");
+    throw new Error("Failed to increment daily traffic: " + error.message);
   }
 };
 

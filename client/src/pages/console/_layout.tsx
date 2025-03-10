@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components";
+import { AppSidebar, NavUser } from "@/components";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,7 +33,7 @@ export default function Dashboard() {
     <SidebarProvider className="h-screen overflow-hidden">
       <AppSidebar/>
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b">
+        <header className="relative flex h-16 shrink-0 items-center gap-2 border-b">
           <div className="flex items-center gap-2 px-3">
             <SidebarTrigger />
             <Separator orientation="vertical" className="mr-2 h-4" />
@@ -58,6 +58,7 @@ export default function Dashboard() {
               </Breadcrumb>
             )}
           </div>
+          <NavUser/>
         </header>
         <ScrollArea className="w-full h-full dark:bg-black bg-white  dark:bg-dot-white/[0.2] bg-dot-black/[0.2] relative flex items-center justify-center">
           <Outlet />

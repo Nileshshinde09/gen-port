@@ -18,12 +18,13 @@ class _Portfolio {
   async createPortfolio(payload: CreatePortfolioPayload): Promise<AxiosResponse<PortfolioResponse>> {
     try {
       const response = await axios.post<PortfolioResponse>(
-        "/api/v1/portfolios",
+        "/api/v1/portfolio",
         payload,
         {
           headers: { "Content-Type": "application/json" },
         }
       );
+      
       return response;
     } catch (error: any) {
       console.error(
@@ -39,7 +40,7 @@ class _Portfolio {
   async getMyPortfolioList(): Promise<AxiosResponse<PortfolioResponse>> {
     try {
       const response = await axios.get<PortfolioResponse>(
-        "/api/v1/portfolios/my-portfolios",
+        "/api/v1/portfolio/my-portfolios",
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -59,7 +60,7 @@ class _Portfolio {
   async getPortfolio(portfolioId: string): Promise<AxiosResponse<PortfolioResponse>> {
     try {
       const response = await axios.get<PortfolioResponse>(
-        `/api/v1/portfolios/${portfolioId}`,
+        `/api/v1/portfolio/${portfolioId}`,
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -82,7 +83,7 @@ class _Portfolio {
   ): Promise<AxiosResponse<PortfolioResponse>> {
     try {
       const response = await axios.get<PortfolioResponse>(
-        `/api/v1/portfolios/public/${portfolioId}/${accessToken}`
+        `/api/v1/portfolio/public/${portfolioId}/${accessToken}`
       );
       return response;
     } catch (error: any) {
@@ -95,6 +96,23 @@ class _Portfolio {
     }
   }
 
+  async getPortfolioPreview(
+    _id:string
+  ): Promise<AxiosResponse<PortfolioResponse>> {
+    try {
+      const response = await axios.get<PortfolioResponse>(
+        `/api/v1/portfolio/preview/${_id}`
+      );
+      return response;
+    } catch (error: any) {
+      console.error(
+        `[Get Public Portfolio Error]: ${error.response?.data?.message || error.message}`
+      );
+      throw new Error(
+        error.response?.data?.message || "An error occurred while fetching public portfolio."
+      );
+    }
+  }
   // Update portfolio
   async updatePortfolio(
     portfolioId: string,
@@ -102,7 +120,7 @@ class _Portfolio {
   ): Promise<AxiosResponse<PortfolioResponse>> {
     try {
       const response = await axios.patch<PortfolioResponse>(
-        `/api/v1/portfolios/${portfolioId}`,
+        `/api/v1/portfolio/${portfolioId}`,
         payload,
         {
           headers: { "Content-Type": "application/json" },
@@ -123,7 +141,7 @@ class _Portfolio {
   async deletePortfolio(portfolioId: string): Promise<AxiosResponse<PortfolioResponse>> {
     try {
       const response = await axios.delete<PortfolioResponse>(
-        `/api/v1/portfolios/${portfolioId}`,
+        `/api/v1/portfolio/${portfolioId}`,
         {
           headers: { "Content-Type": "application/json" },
         }

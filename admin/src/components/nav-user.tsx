@@ -37,9 +37,6 @@ export function NavUser() {
     dispatch(logout());
   };
   if (!user) return;
-  console.log('====================================');
-  console.log();
-  console.log('====================================');
   return (
     <SidebarMenu>
       <SidebarMenuItem>

@@ -4,7 +4,8 @@ import {
   LifeBuoy,
   Send,
   Users2,
-  ChartPie
+  ChartPie,
+  LockIcon
 } from "lucide-react"
 
 import { NavMain } from "../components/nav-main"
@@ -32,6 +33,10 @@ const data = {
           title: "All Users",
           url: "all-users",
         },
+        {
+          title: "User stats",
+          url: "user-stats",
+        },
         // {
         //   title: "Logged In User",
         //   url: "/dashboard/users/logged-in-users",
@@ -53,6 +58,16 @@ const data = {
           url: "application-stats",
         },
         
+      ],
+    },
+    {
+      title: "Register User",
+      icon: LockIcon,
+      items: [
+        {
+          title: "register user",
+          url: "user-sign-up",
+        }
       ],
     },
   ],

@@ -440,6 +440,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const incomingObject = req.body;
+
   if (!incomingObject) throw new ApiError(404, "Account details not found");
   const filteredObj = {};
   let hasFilledField = false;
@@ -611,7 +612,6 @@ const updateProfile = asyncHandler(async (req, res) => {
       if (!Array.isArray(updates[key])) {
         throw new ApiError(400, `${key} should be an array`);
       }
-      console.log(updates[key]);
       user[key] = updates[key];
     } else {
       

@@ -6,7 +6,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
+  AlertDialogblogContent,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -435,11 +435,11 @@ export default function Component() {
                   </div>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
+                    <AlertDialogblogContent>
                       This action cannot be undone. This will permanently delete{" "}
                       {table.getSelectedRowModel().rows.length} selected{" "}
                       {table.getSelectedRowModel().rows.length === 1 ? "row" : "rows"}.
-                    </AlertDialogDescription>
+                    </AlertDialogblogContent>
                   </AlertDialogHeader>
                 </div>
                 <AlertDialogFooter>

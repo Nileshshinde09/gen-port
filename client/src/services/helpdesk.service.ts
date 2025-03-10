@@ -13,9 +13,9 @@ interface UserResponse {
 }
 interface RaiseSupportTicketPayload {
   issueType: string;
-  description: string;
+  content: string;
 }
-class _HelpDesk {
+class _HelpDesk { 
   async sendFeedback({
     rating,
     comment,
@@ -63,12 +63,12 @@ class _HelpDesk {
 
   async raiseSupportTicket({
     issueType,
-    description,
+    content,
   }: RaiseSupportTicketPayload): Promise<AxiosResponse<any>> {
     try {
       return await axios.post("/api/v1/helpdesk/s/raise-support-ticket", {
         issueType,
-        description,
+        content,
       });
     } catch (error: any) {
       console.error(
@@ -79,6 +79,21 @@ class _HelpDesk {
       throw new Error(
         error.response?.data?.message ||
           "Something went wrong while raising your support ticket. Please try again later."
+      );
+    }
+  }
+  async getMyAllTickets(): Promise<AxiosResponse<any>> {
+    try {
+      return await axios.get("/api/v1/helpdesk/s/get-my-support-tickets");
+    } catch (error: any) {
+      console.error(
+        `[Fetch Tickets Error]: ${
+          error.response?.data?.message || "Unable to retrieve your tickets."
+        }`
+      );
+      throw new Error(
+        error.response?.data?.message ||
+          "Something went wrong while fetching your tickets. Please try again later."
       );
     }
   }

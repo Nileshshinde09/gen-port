@@ -1,17 +1,45 @@
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Briefcase, GraduationCap, Mail, MapPin, Moon, Phone, Sun, Code, Folder, ChevronRight } from "lucide-react"
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Briefcase,
+  GraduationCap,
+  Mail,
+  MapPin,
+  Moon,
+  Phone,
+  Sun,
+  Code,
+  Folder,
+  ChevronRight,
+} from "lucide-react";
 
-export default function Home() {
-  const [darkMode, setDarkMode] = useState(false)
-
-  // Add dummy data based on schema
-  const profileData = {
+export default function Home({ portfolio }: { portfolio?: any }) {
+  const [darkMode, setDarkMode] = useState(false);
+  const [visibleFields, setVisibleFields] = useState({
+    avatar: -1,
+    bio: -1,
+    designation: -1,
+    education: -1,
+    email: -1,
+    experience: -1,
+    fullName: -1,
+    location: -1,
+    projects: -1,
+    skills: -1,
+    username: -1,
+  });
+  const [profileData, setProfileData] = useState({
     email: "nilesh@gmail.com",
     avatar: null,
     designation: "Full Stack Developer",
@@ -28,7 +56,7 @@ export default function Home() {
         startDate: "2021-08-12T18:30:00.000Z",
         endDate: "2024-07-12T18:30:00.000Z",
         currentlyStudying: false,
-      }
+      },
     ],
     experience: [
       {
@@ -38,7 +66,7 @@ export default function Home() {
         endDate: "2025-02-10T09:47:44.565Z",
         currentlyWorking: false,
         description: "my work involed handling and building graphql api's",
-      }
+      },
     ],
     projects: [
       {
@@ -48,55 +76,79 @@ export default function Home() {
         socials: ["https://github.com/Nileshshinde09"],
         repositoryLink: "https://github.com/Nileshshinde09",
         liveDemoLink: "https:",
-      }
-    ]
-  }
-
+      },
+    ],
+  });
+  useEffect(() => {
+    if (!portfolio) return;
+    setProfileData(portfolio?.user);
+    setVisibleFields(portfolio.visibleFields)
+  }, [portfolio]);
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode)
-    document.documentElement.classList.toggle("dark")
-  }
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle("dark");
+  };
 
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.5 },
-  }
+  };
 
   return (
     <div
-      className={` min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-neutral-950 dark:to-neutral-950 transition-colors duration-300 ${darkMode ? "dark" : ""}`}
+      className={` min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-neutral-950 dark:to-neutral-950 transition-colors duration-300 ${
+        darkMode ? "dark" : ""
+      }`}
     >
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <motion.div className="flex justify-end mb-4" {...fadeInUp}>
-          <Switch checked={darkMode} onCheckedChange={toggleDarkMode} className="mr-2" />
-          {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+          <Switch
+            checked={darkMode}
+            onCheckedChange={toggleDarkMode}
+            className="mr-2"
+          />
+          {darkMode ? (
+            <Moon className="h-5 w-5" />
+          ) : (
+            <Sun className="h-5 w-5" />
+          )}
         </motion.div>
 
         <motion.header className="text-center mb-12" {...fadeInUp}>
-          <Avatar className="w-32 h-32 mx-auto mb-4 border-4 border-primary">
-            <AvatarImage src={profileData.avatar || "/placeholder.svg"} alt={profileData.fullName} />
-            <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-          </Avatar>
-          <h1 className="text-3xl font-medium mb-2">{profileData.fullName}</h1>
-          <p className="text-lg text-muted-foreground mb-4">{profileData.designation}</p>
+          {visibleFields.avatar!==0&&<Avatar className="w-32 h-32 mx-auto mb-4 border-4 border-primary">
+            <AvatarImage
+              src={profileData.avatar || "/placeholder.svg"}
+              alt={profileData.fullName}
+            />
+            <AvatarFallback>
+              {profileData?.fullName
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")}
+            </AvatarFallback>
+          </Avatar>}
+          {visibleFields.fullName!==0&&<h1 className="text-3xl font-medium mb-2">{profileData.fullName}</h1>}
+         {visibleFields.designation!==0&& (<p className="text-lg text-muted-foreground mb-4">
+            {profileData.designation}
+          </p>)}
           <div className="flex justify-center space-x-4 text-muted-foreground">
-            <div className="flex items-center">
+            {visibleFields.location!==0&&<div className="flex items-center">
               <MapPin className="mr-2 h-4 w-4" />
               <span>{profileData.location}</span>
-            </div>
-            <div className="flex items-center">
+            </div>}
+            {visibleFields.email!==0&&<div className="flex items-center">
               <Mail className="mr-2 h-4 w-4" />
               <span>{profileData.email}</span>
-            </div>
-            <div className="flex items-center">
+            </div>}
+            {/* {visibleFields.&&<div className="flex items-center">
               <Phone className="mr-2 h-4 w-4" />
               <span>{profileData.phone}</span>
-            </div>
+            </div>} */}
           </div>
         </motion.header>
 
-        <motion.section className="mb-12" {...fadeInUp}>
+        {visibleFields.skills!==0&&<motion.section className="mb-12" {...fadeInUp}>
           <Card className="overflow-hidden">
             <CardHeader className="bg-primary text-primary-foreground">
               <CardTitle className="text-xl font-medium flex items-center">
@@ -105,17 +157,21 @@ export default function Home() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="flex flex-wrap gap-2">
-                {profileData.skills.map((skill, index) => (
-                  <Badge key={index} variant="secondary" className="text-sm py-1 px-3">
+                {profileData?.skills?.map((skill, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="text-sm py-1 px-3"
+                  >
                     {skill}
                   </Badge>
                 ))}
               </div>
             </CardContent>
           </Card>
-        </motion.section>
+        </motion.section>}
 
-        <motion.section className="mb-12" {...fadeInUp}>
+        {visibleFields.experience!==0&&<motion.section className="mb-12" {...fadeInUp}>
           <Card className="overflow-hidden">
             <CardHeader className="bg-primary text-primary-foreground">
               <CardTitle className="text-xl font-medium flex items-center">
@@ -124,13 +180,16 @@ export default function Home() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-6">
-                {profileData.experience.map((exp, index) => (
+                {profileData?.experience?.map((exp, index) => (
                   <div key={index} className="relative pl-8 pb-8">
                     <div className="absolute left-0 top-0 h-full w-0.5 bg-primary"></div>
                     <div className="absolute left-0 -ml-[6.5px] top-0 w-4 h-4 rounded-full bg-primary"></div>
                     <h3 className="text-lg font-serif">{exp.position}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {exp.company} | {new Date(exp.startDate).getFullYear()} - {exp.currentlyWorking ? 'Present' : new Date(exp.endDate).getFullYear()}
+                      {exp.company} | {new Date(exp.startDate)?.getFullYear()} -{" "}
+                      {exp.currentlyWorking
+                        ? "Present"
+                        : new Date(exp.endDate)?.getFullYear()}
                     </p>
                     <div className="mt-2">
                       <div className="flex items-start">
@@ -143,9 +202,9 @@ export default function Home() {
               </div>
             </CardContent>
           </Card>
-        </motion.section>
+        </motion.section>}
 
-        <motion.section className="mb-12" {...fadeInUp}>
+        {visibleFields.education!==0&&<motion.section className="mb-12" {...fadeInUp}>
           <Card className="overflow-hidden">
             <CardHeader className="bg-primary text-primary-foreground">
               <CardTitle className="text-xl font-medium flex items-center">
@@ -154,13 +213,17 @@ export default function Home() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-4">
-                {profileData.education.map((edu, index) => (
+                {profileData?.education?.map((edu, index) => (
                   <div key={index} className="flex items-center">
                     <div className="w-2 h-2 rounded-full bg-primary mr-4"></div>
                     <div>
                       <h3 className="font-serif text-lg">{edu.degree}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {edu.institution}, {new Date(edu.startDate).getFullYear()} - {edu.currentlyStudying ? 'Present' : new Date(edu.endDate).getFullYear()}
+                        {edu.institution},{" "}
+                        {new Date(edu.startDate)?.getFullYear()} -{" "}
+                        {edu.currentlyStudying
+                          ? "Present"
+                          : new Date(edu.endDate)?.getFullYear()}
                       </p>
                     </div>
                   </div>
@@ -168,9 +231,9 @@ export default function Home() {
               </div>
             </CardContent>
           </Card>
-        </motion.section>
+        </motion.section>}
 
-        <motion.section {...fadeInUp}>
+        {visibleFields.projects!==0&&<motion.section {...fadeInUp}>
           <Card className="overflow-hidden">
             <CardHeader className="bg-primary text-primary-foreground">
               <CardTitle className="text-xl font-medium flex items-center">
@@ -179,12 +242,19 @@ export default function Home() {
             </CardHeader>
             <CardContent className="pt-6">
               <Tabs defaultValue="project1" className="w-full">
-                <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${profileData.projects.length}, 1fr)` }}>
-                  {profileData.projects.map((project, index) => (
-                    <TabsTrigger key={index} value={`project${index + 1}`}>{project.name}</TabsTrigger>
+                <TabsList
+                  className="grid w-full"
+                  style={{
+                    gridTemplateColumns: `repeat(${profileData?.projects?.length}, 1fr)`,
+                  }}
+                >
+                  {profileData?.projects?.map((project, index) => (
+                    <TabsTrigger key={index} value={`project${index + 1}`}>
+                      {project.name}
+                    </TabsTrigger>
                   ))}
                 </TabsList>
-                {profileData.projects.map((project, index) => (
+                {profileData?.projects?.map((project, index) => (
                   <TabsContent key={index} value={`project${index + 1}`}>
                     <Card>
                       <CardHeader>
@@ -193,20 +263,32 @@ export default function Home() {
                       </CardHeader>
                       <CardContent className="space-y-2">
                         <div className="flex flex-wrap gap-2 mb-4">
-                          {project.technologies.map((tech, i) => (
-                            <Badge key={i} variant="secondary">{tech}</Badge>
+                          {project?.technologies?.map((tech, i) => (
+                            <Badge key={i} variant="secondary">
+                              {tech}
+                            </Badge>
                           ))}
                         </div>
                         <p className="flex items-start">
                           <ChevronRight className="h-5 w-5 text-primary shrink-0 mr-2" />
-                          <a href={project.repositoryLink} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                          <a
+                            href={project.repositoryLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
                             Repository Link
                           </a>
                         </p>
                         {project.liveDemoLink && (
                           <p className="flex items-start">
                             <ChevronRight className="h-5 w-5 text-primary shrink-0 mr-2" />
-                            <a href={project.liveDemoLink} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                            <a
+                              href={project.liveDemoLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline"
+                            >
                               Live Demo
                             </a>
                           </p>
@@ -218,8 +300,8 @@ export default function Home() {
               </Tabs>
             </CardContent>
           </Card>
-        </motion.section>
+        </motion.section>}
       </div>
     </div>
-  )
+  );
 }

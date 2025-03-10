@@ -24,6 +24,7 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
     },
+
     isAdmin: {
       type: Boolean,
       default: false,
@@ -49,6 +50,14 @@ const userSchema = new Schema(
     avatar: {
       type: Schema.Types.ObjectId,
       ref: "Images",
+      default: null,
+    },
+    phone: {
+      type: String,
+      default: null,
+    },
+    avatarURL: {
+      type: String,
       default: null,
     },
     gender: {
