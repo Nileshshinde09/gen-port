@@ -14,9 +14,6 @@ export const REFRESH_TOKEN_EXPIRY = String(process.env.REFRESH_TOKEN_EXPIRY);
 export const CLOUDINARY_CLOUD_NAME = String(process.env.CLOUDINARY_CLOUD_NAME)
 export const CLOUDINARY_API_KEY = String(process.env.CLOUDINARY_API_KEY)
 export const CLOUDINARY_API_SECRET = String(process.env.CLOUDINARY_API_SECRET)
-export const CLOUDINARY_CLOUD_NAME_V2 = String(process.env.CLOUDINARY_CLOUD_NAME_V2)
-export const CLOUDINARY_API_KEY_V2 = String(process.env.CLOUDINARY_API_KEY_V2)
-export const CLOUDINARY_API_SECRET_V2 = String(process.env.CLOUDINARY_API_SECRET_V2)
 
 //----------------------------------------------------------------------------------------
 export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
