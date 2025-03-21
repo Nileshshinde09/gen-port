@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { PersonalInfo } from "./PersonalInfo";
 import { AboutMe } from "./AboutMe";
 import { Experience } from "./Experience";

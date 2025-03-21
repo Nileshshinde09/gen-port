@@ -54,7 +54,7 @@ export function Skills() {
     },
   });
 
-  const onSubmit = async (data: SkillsFormValues) => {
+  const onSubmit = async () => {
     try {
       setIsLoading(true);
       

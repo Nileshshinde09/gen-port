@@ -5,13 +5,12 @@ import Subscribe from "@/components/Home/subscribe";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { changeScrollState, NavUp } from "@/store/slices/themeSlice";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef} from "react";
 
 const Home = () => {
   const dispatch = useAppDispatch();
   const isNavVisible = useAppSelector((state) => state.theme.isNavVisible);
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
   useEffect(() => {
     if (isNavVisible) return;
     dispatch(NavUp());
@@ -22,7 +21,6 @@ const Home = () => {
         const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
         const progress = (scrollTop / (scrollHeight - clientHeight)) * 100;
         dispatch(changeScrollState(progress));
-        setScrollProgress(progress);
       }
     };
 

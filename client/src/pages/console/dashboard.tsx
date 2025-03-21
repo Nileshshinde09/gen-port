@@ -33,8 +33,6 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { getPortfolioById } from "@/lib/utils";
-import { useAppSelector } from "@/store/hooks";
 
 interface visibleFields {
   avatar: number;
@@ -67,7 +65,6 @@ interface Portfolio {
 
 const EditPortfolioDialog = ({ 
   portfolio, 
-  onUpdate 
 }: { 
   portfolio: Portfolio,
   onUpdate: (portfolioId: string, data: Partial<Portfolio>) => Promise<void>
@@ -124,15 +121,6 @@ const EditPortfolioDialog = ({
     }
   }, [isOpen, portfolio.portfolioId]);
 
-  const handleFieldChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      fields: {
-        ...prev.fields,
-        [field]: value
-      }
-    }));
-  };
 
   const handleVisibleFieldChange = (field: keyof visibleFields) => {
     if (!formData.visibleFields) return;
@@ -279,7 +267,6 @@ const PortfolioCard = ({
 }) => {
   const { toast } = useToast()
   const navigate = useNavigate();
-  const username = useAppSelector(state => state.user.userData?.username);
   const fieldLabels: Record<string, string> = {
     username: "Username",
     email: "Email",

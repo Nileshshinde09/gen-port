@@ -1,10 +1,8 @@
 import * as React from "react";
-import { FaGripfire } from "react-icons/fa6";
 import { FcFeedback } from "react-icons/fc";
 import { FcOnlineSupport } from "react-icons/fc";
 import {
   SiCreatereactapp,
-  SiGoogleanalytics,
   SiGoogledocs,
   SiHomebridge,
 } from "react-icons/si";

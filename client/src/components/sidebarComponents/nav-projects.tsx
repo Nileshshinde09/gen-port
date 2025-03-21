@@ -1,27 +1,15 @@
 import {
-  Folder,
-  MoreHorizontal,
-  Share,
-  Trash2,
   type LucideIcon,
 } from "lucide-react";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+
 import type { IconType } from "react-icons/lib";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "../ui/sidebar";
 import { Link } from "react-router-dom";
 
@@ -34,7 +22,6 @@ export function NavProjects({
     icon: LucideIcon | IconType;
   }[];
 }) {
-  const { isMobile } = useSidebar();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">

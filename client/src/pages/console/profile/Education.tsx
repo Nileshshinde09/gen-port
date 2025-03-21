@@ -433,7 +433,6 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useAppSelector } from "@/store/hooks"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Auth } from "@/services"
 import { toast } from "@/hooks/use-toast"
 import { format } from "date-fns"
@@ -455,27 +454,7 @@ const educationSchema = z.object({
 
 type EducationFormValues = z.infer<typeof educationSchema>
 
-const LoadingSkeleton = () => {
-  return (
-    <div className="space-y-4">
-      {/* User Profile Header Skeleton */}
-      <div className="flex items-center space-x-4">
-        <Skeleton className="h-12 w-12 rounded-full" /> {/* Avatar */}
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-[200px]" /> {/* Name */}
-          <Skeleton className="h-4 w-[150px]" /> {/* Email/subtitle */}
-        </div>
-      </div>
 
-      {/* Content Skeleton */}
-      <div className="space-y-3">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
-      </div>
-    </div>
-  )
-}
 
 export function Education() {
   const [open, setOpen] = useState(false)

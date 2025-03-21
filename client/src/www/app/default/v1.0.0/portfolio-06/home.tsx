@@ -9,7 +9,7 @@ import { BoxIcon as Button } from "lucide-react"
 
 export default function Home({ portfolio }: { portfolio?: any }) {
   const [darkMode, setDarkMode] = useState(false)
-  const [error, setError] = useState<boolean>(false)
+  
   const [isUnauthorized, setIsUnauthorized] = useState<boolean>(false)
   const [profileData, setProfileData] = useState<any>(null)
   const [visibleFields, setVisibleFields] = useState({
@@ -37,7 +37,6 @@ export default function Home({ portfolio }: { portfolio?: any }) {
           setVisibleFields(portfolio.visibleFields)
         }, [portfolio]);
       } catch (err) {
-        setError(true)
         console.error("Error fetching portfolio:", err)
         setIsUnauthorized(true)
       }

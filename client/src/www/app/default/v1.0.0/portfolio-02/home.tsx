@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -10,13 +10,11 @@ import {
   GraduationCap,
   Rocket,
   Terminal,
-  Phone,
 } from "lucide-react";
 
 export default function PortfolioPage({ portfolio }: { portfolio?: any }) {
   const [darkMode, setDarkMode] = useState(false);
   const { scrollYProgress } = useScroll();
-  const x = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const [visibleFields, setVisibleFields] = useState({
     avatar: -1,
     bio: -1,

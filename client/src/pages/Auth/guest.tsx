@@ -2,19 +2,19 @@ import { Icons } from "@/components";
 import { Button } from "@/components/ui/button";
 import { Flower } from "lucide-react";
 import React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useToast } from "../../hooks/use-toast";
 import { Auth } from "../../services";
 import { setAuthPage } from "../../store/slices/themeSlice";
 import { login } from "@/store/slices/userSlice";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 const Guest = ({ className, ...props }: UserAuthFormProps) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const dispatch = useDispatch();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const Guest = ({ className, ...props }: UserAuthFormProps) => {
   }, []);
 
   const onSubmit = async () => {
-    setIsSubmitting(true);
+    setIsLoading(true);
     try {
       const response = await Auth.createGuestUser();
       // if (response.status === 201) {
@@ -51,13 +51,13 @@ const Guest = ({ className, ...props }: UserAuthFormProps) => {
         variant: "destructive",
       });
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <>
-      <div className="mx-auto">
+      <div className={cn("mx-auto",className)} {...props}>
         <div className="w-[22rem] mx-auto sm:mt-1 flex flex-col space-y-8">
           <div className="grid gap-2 text-center">
             <h1 className="text-3xl font-bold text-black dark:text-white">

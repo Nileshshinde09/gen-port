@@ -107,7 +107,8 @@ export const REQUIRED_VISIBLE_FIELDS_ENUM = Object.freeze({
     SKILLS:"skills",
     EDUCATION:"education",
     EXPERIENCE:"experience",
-    PROJECTS:"projects"
+    PROJECTS:"projects",
+    AVATAR_ID:"avatarId"
 
 })
 export const REQUIRED_VISIBLE_FIELDS=Object.values(REQUIRED_VISIBLE_FIELDS_ENUM);

@@ -15,7 +15,7 @@ export default function Component() {
             W/ arrow
           </Button>
         </TooltipTrigger>
-        <TooltipContent className="dark px-2 py-1 text-xs" showArrow={true}>
+        <TooltipContent className="dark px-2 py-1 text-xs">
           This tooltip has an arrow
         </TooltipContent>
       </Tooltip>

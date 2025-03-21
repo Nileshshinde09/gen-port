@@ -12,6 +12,8 @@ import {
   registerGuestUser,
   upgradeGuestUser,
   updateProfile,
+  updateProfileImage,
+  removeProfileImage,
 } from "../controllers/user.controller.js";
 import { isAdminMiddleware, verifyJWT } from "../middlewares/auth.middleware.js";
 import { updateUserMetrics } from "../middlewares/userMetrics.middleware.js";
@@ -42,8 +44,9 @@ router.route("/change-password").post(verifyJWT,checkIfBlocked, updateUserMetric
 
 router.route("/update-account").post(verifyJWT,checkIfBlocked, updateUserMetrics, updateAccountDetails);
 
-router.route("/update-account-image").post(verifyJWT,checkIfBlocked, updateUserMetrics,upload.single('file'),setProfileImage, updateAccountDetails);
+router.route("/update-account-image").post(verifyJWT,checkIfBlocked, updateUserMetrics,upload.single('file'),setProfileImage, updateProfileImage);
 
+router.route("/remove-account-image").delete(verifyJWT,checkIfBlocked,removeProfileImage)
 
 router.route("/check-unique-username").get(isUsernameUnique);
 

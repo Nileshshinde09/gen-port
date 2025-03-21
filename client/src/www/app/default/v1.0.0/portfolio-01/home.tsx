@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion} from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,8 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Briefcase, Mail, MapPin, Moon, Phone, Sun } from "lucide-react";
+import { Briefcase, Mail, MapPin, Moon, Sun } from "lucide-react";
 
 // Define interfaces for type safety
 interface Education {
@@ -57,10 +56,7 @@ interface profileData {
   projects: Project[];
 }
 
-// Props interface for the Home component
-interface HomeProps {
-  profileData?: profileData;
-}
+
 
 // Helper function to format dates
 const formatDate = (dateString: string): string => {
@@ -237,11 +233,6 @@ export default function Home({ portfolio }: { portfolio?: any }) {
     hover: { scale: 1.02, transition: { duration: 0.2 } },
   };
 
-  const tabContentVariants = {
-    initial: { opacity: 0, x: 20 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -20 },
-  };
 
   return (
     <div

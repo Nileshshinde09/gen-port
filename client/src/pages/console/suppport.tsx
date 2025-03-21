@@ -98,8 +98,8 @@ export default function SupportPage() {
       })
 
       if (response.status === 200) {
-        const newTicket: Ticket = response.data.data.data
-        setTickets([newTicket, ...tickets])
+        const newTicket: any = response.data.data.data
+        setTickets(newTicket)
         toast({
           title: "Success!",
           description: "Your support ticket has been created.",
@@ -304,7 +304,7 @@ export default function SupportPage() {
                   <Button
                     variant="outline"
                     className="mt-4"
-                    onClick={() => document.querySelector('[data-value="new"]')?.click()}
+                    onClick={() => document.querySelector('[data-value="new"]')}
                   >
                     Create your first ticket
                   </Button>

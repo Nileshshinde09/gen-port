@@ -13,6 +13,8 @@ import mongoose from "mongoose";
 import { UserActivity } from "../model/userActivity.model.js";
 import { faker } from "@faker-js/faker";
 import { v4 as uuidv4 } from "uuid";
+import { removeImageContentFromCloudinary } from "../utils/cloudinary.js";
+import { Images } from "../model/images.model.js";
 
 const findUsersByUsername = asyncHandler(async (req, res) => {
   const userId = req?.user?._id;
@@ -272,10 +274,8 @@ const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({
       $or: [{ username }, { email }],
     });
-    if(!user)
-      throw new ApiError(404, "User with this email id not found!");
+    if (!user) throw new ApiError(404, "User with this email id not found!");
 
-    
     if (ADMIN_EMAILS.some((email) => email === user.email)) {
       if (!user.isAdmin) {
         await User.findByIdAndUpdate(user?._id, { isAdmin: true });
@@ -614,13 +614,12 @@ const updateProfile = asyncHandler(async (req, res) => {
       }
       user[key] = updates[key];
     } else {
-      
       user[key] = updates[key];
     }
   });
 
   await user.save();
-  const resUser =await User.findById(user?._id).select("-password");
+  const resUser = await User.findById(user?._id).select("-password");
   if (!resUser)
     throw new ApiError(
       401,
@@ -631,7 +630,46 @@ const updateProfile = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { resUser }, "Profile updated successfully"));
 });
 
+const updateProfileImage = asyncHandler(async (req, res) => {
+  const userId = req?.user?._id;
+  const avatar = req.body.avatar;
+  const avatarId = req.body.avatarId;
+  if (!userId) throw new ApiError(401, "unauthorised request.");
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(400, "User not found");
+  if (!avatar || !avatarId)
+    throw new ApiError(404, "Avtar or Avatar id not found.");
+  user.avatar = avatar;
+  user.avatarId = avatarId;
+  await user.save();
+  const resUser = await User.findById(user?._id).select("-password");
+  if (!resUser) throw new ApiError(401, "something went wrong while");
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { user: resUser }, "image uploaded successfully.")
+    );
+});
+const removeProfileImage = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  if (!userId) throw new ApiError(401, "unauthorised request.");
+  const user = await User.findById(userId);
+  if (!user.avatar || !user.avatarId)
+    throw new ApiError(404, "Image not found in database");
+  const image = await Images.findById(user.avatarId);
+  if (!image) throw new ApiError(404, "image data not founde in database");
+  await removeImageContentFromCloudinary(image.public_id);
+  await Images.findByIdAndDelete(user.avatarId);
+  await User.findByIdAndUpdate(userId, {
+    $unset: { avatar: 1, avatarId: 1 },
+  });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Image removed successfully"));
+});
 export {
+  updateProfileImage,
+  removeProfileImage,
   updateProfile,
   registerGuestUser,
   upgradeGuestUser,

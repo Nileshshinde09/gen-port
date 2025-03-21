@@ -1,5 +1,4 @@
-import { useParams } from "react-router-dom";
-import { InteractiveCodeBlock } from "./components/config/interactive-code.block";
+
 import CommandBox from "./components/config/command-box";
 
 export default function DeployDocs() {

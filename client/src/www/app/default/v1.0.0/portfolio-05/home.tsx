@@ -4,8 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
-import { GraduationCap, Mail, Moon, Sun, Code, Terminal, Linkedin, Github, Phone, Lock } from "lucide-react"
-import { BoxIcon as Button } from "lucide-react"
+import { GraduationCap, Mail, Moon, Sun, Code, Terminal, Linkedin, Github, Phone } from "lucide-react"
 
 // Add this interface near the top of the file
 interface PortfolioData {
@@ -48,8 +47,6 @@ interface PortfolioData {
 
 export default function Home({ portfolio }: { portfolio?: any }) {
   const [darkMode, setDarkMode] = useState(false)
-  const [error, setError] = useState<boolean>(false)
-  const [isUnauthorized, setIsUnauthorized] = useState<boolean>(false)
   const [profileData, setProfileData] = useState<PortfolioData | null>(null)
   const [visibleFields, setVisibleFields] = useState({
     avatar: -1,
@@ -72,30 +69,6 @@ export default function Home({ portfolio }: { portfolio?: any }) {
     setVisibleFields(portfolio.visibleFields)
   }, [portfolio]);
 
-  if (isUnauthorized) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-100">
-        <div className="max-w-md rounded-2xl bg-white p-8 shadow-lg">
-          <div className="flex flex-col items-center text-center">
-            <Lock className="h-16 w-16 text-red-500" />
-            <h1 className="mt-4 text-2xl font-bold text-gray-800">Access Denied</h1>
-            <p className="mt-2 text-gray-600">
-              You don't have permission to view this page. Please contact your administrator if you believe this is a
-              mistake.
-            </p>
-            <div className="mt-6 flex gap-4 ">
-              <Button
-                className="rounded-xl bg-blue-500 px-6 py-3 text-white bg-neutral-950 hover:bg-neutral-800"
-                onClick={() => window.location.reload()}
-              >
-                Retry
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode)
@@ -267,7 +240,7 @@ export default function Home({ portfolio }: { portfolio?: any }) {
             <div className="space-y-12">
               <h2 className="text-4xl font-medium mb-12">Professional Journey</h2>
 
-              {profileData?.experience?.map((exp, i) => (
+              {profileData?.experience?.map((exp) => (
                 <motion.div key={exp._id} className="group relative pl-8" whileHover={{ x: 10 }}>
                   <div className="absolute left-0 top-4 h-4 w-4 bg-cyan-400 rounded-full" />
                   <div className="absolute left-2 top-4 h-full w-1 bg-gradient-to-b from-cyan-400/30 to-rose-400/30" />
@@ -352,7 +325,7 @@ export default function Home({ portfolio }: { portfolio?: any }) {
             <h2 className="text-4xl font-medium mb-12">Featured Work</h2>
 
             <div className="grid md:grid-cols-2 gap-8">
-              {profileData?.projects?.map((project, i) => (
+              {profileData?.projects?.map((project) => (
                 <motion.div
                   key={project._id}
                   whileHover={{ y: -5 }}

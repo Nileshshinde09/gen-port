@@ -17,7 +17,6 @@ import {
   Mail,
   MapPin,
   Moon,
-  Phone,
   Sun,
   Code,
   Folder,

@@ -27,25 +27,22 @@ import {
   GraduationCap,
   Mail,
   MapPin,
-  Moon,
   Phone,
-  Sun,
   Briefcase,
   Plus,
   Trash2,
   Check,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 const ProfilePage = () => {
-  const [darkMode, setDarkMode] = useState(false);
   const [personalInfo, setPersonalInfo] = useState({
     name: "John Doe",
     title: "Full Stack Developer",
     location: "New York, NY",
     email: "john.doe@example.com",
     phone: "+1 (555) 123-4567",
+    avatar: "https://via.placeholder.com/150",
   });
   const [aboutMe, setAboutMe] = useState(
     "Passionate full-stack developer with 5+ years of experience in building scalable web applications. Proficient in JavaScript, React, Node.js, and cloud technologies. Always eager to learn and apply new technologies to solve complex problems."
@@ -126,9 +123,7 @@ const ProfilePage = () => {
 
   return (
     <div
-      className={`min-h-screen py-8 transition-colors duration-300 ${
-        darkMode ? "dark" : ""
-      }`}
+      className={`min-h-screen py-8 transition-colors duration-300`}
     >
       <div className="container mx-auto max-w-7xl px-4">
         <div className="grid gap-8 md:grid-cols-3">
@@ -141,7 +136,7 @@ const ProfilePage = () => {
             >
               <CardHeader className="text-center">
                 <Avatar className="w-32 h-32 mx-auto mb-4 border-4 border-primary">
-                  <AvatarImage src="/placeholder.svg" alt={personalInfo.name} />
+                  <AvatarImage src={personalInfo.avatar||"/placeholder.svg"}  alt={personalInfo.name} />
                   <AvatarFallback>
                     {personalInfo.name
                       .split(" ")

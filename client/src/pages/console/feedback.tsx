@@ -149,7 +149,7 @@ export default function FeedbackPage() {
                     <FormControl>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium">Additional comments (optional)</p>
+                          <p className="text-sm font-medium">Additional comments</p>
                           <p className="text-xs text-muted-foreground">{field.value?.length || 0} characters</p>
                         </div>
                         <Textarea

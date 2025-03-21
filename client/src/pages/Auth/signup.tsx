@@ -85,6 +85,7 @@ const SignUp: React.FC = () => {
 
   const onSubmit: SubmitHandler<SignUpFormValues> = async (data) => {
     setIsSubmitting(true);
+    setIsLoading(true)
     try {
       const response = await Auth.signup(data);
       toast({
@@ -101,6 +102,7 @@ const SignUp: React.FC = () => {
       });
     } finally {
       setIsSubmitting(false);
+      setIsLoading(false)
     }
   };
 

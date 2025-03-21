@@ -9,9 +9,6 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/ui/form";
-
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { Input } from "../../components/ui/input";
 import { z } from "zod";
 import { Button } from "../../components/ui/button";
@@ -23,8 +20,7 @@ interface EmailFormTypes {
   email: string;
 }
 const sendForgotPasswordMail: React.FC = () => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+
     const { toast } = useToast();
     const emailSchema = z.object({email: z.string().email({ message: 'Invalid email address' })})
       

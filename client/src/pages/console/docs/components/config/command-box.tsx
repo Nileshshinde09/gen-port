@@ -14,7 +14,7 @@ const CommandBox = () => {
     const [os, setOs] = useState("windows");
     const [installMethod, setInstallMethod] = useState("npm");
     const [copied, setCopied] = useState(false);
-
+    console.log(os)
     const repoUrl = "github.com/dummy-org/dummy-repo"; // Dummy URL
 
     const generateCommands = () => {

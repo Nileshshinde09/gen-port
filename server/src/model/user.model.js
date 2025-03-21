@@ -48,16 +48,17 @@ const userSchema = new Schema(
       type: String,
     },
     avatar: {
-      type: Schema.Types.ObjectId,
-      ref: "Images",
+      type: String,
       default: null,
     },
     phone: {
       type: String,
       default: null,
     },
-    avatarURL: {
-      type: String,
+    avatarId: {
+
+      type: Schema.Types.ObjectId,
+      ref: "Images",
       default: null,
     },
     gender: {

@@ -4,8 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Mail, Moon, Sun, Code, Terminal, Linkedin, Github, ExternalLink, Lock } from 'lucide-react';
-import { BoxIcon as Button } from 'lucide-react';
+import { Mail, Moon, Sun, Code, Terminal, Linkedin, Github, ExternalLink } from 'lucide-react';
 
 interface PortfolioData {
   email: string;
@@ -48,8 +47,6 @@ interface PortfolioData {
 
 export default function Home({ portfolio }: { portfolio?: any }) {
   const [darkMode, setDarkMode] = useState(false);
-  const [error, setError] = useState<boolean>(false);
-  const [isUnauthorized, setIsUnauthorized] = useState<boolean>(false);
   const [profileData, setProfileData] = useState<PortfolioData | null>(null);
   const [visibleFields, setVisibleFields] = useState({
     avatar: -1,
@@ -78,30 +75,7 @@ export default function Home({ portfolio }: { portfolio?: any }) {
     document.documentElement.classList.toggle("dark");
   };
 
-  if (isUnauthorized) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-100">
-        <div className="max-w-md rounded-2xl bg-white p-8 shadow-lg">
-          <div className="flex flex-col items-center text-center">
-            <Lock className="h-16 w-16 text-red-500" />
-            <h1 className="mt-4 text-2xl font-bold text-gray-800">Access Denied</h1>
-            <p className="mt-2 text-gray-600">
-              You don't have permission to view this page. Please contact your administrator if you believe this is a mistake.
-            </p>
-            <div className="mt-6 flex gap-4 ">
-              <Button
-                className="rounded-xl bg-blue-500 px-6 py-3 text-white bg-neutral-950 hover:bg-neutral-800"
-                onClick={() => window.location.reload()}
-              >
-                Retry
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+ 
   const sectionVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: {

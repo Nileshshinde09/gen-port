@@ -2,7 +2,6 @@ import { AppSidebar, NavUser } from "@/components";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,

@@ -474,28 +474,7 @@ type ExperienceFormValues = z.infer<typeof experienceSchema>
 
 const MotionCard = motion.create(Card)
 
-function DatePickerField({
-  date,
-  onSelect,
-  disabled,
-}: {
-  date?: Date
-  onSelect: (date: Date | undefined) => void
-  disabled?: (date: Date) => boolean
-}) {
-  return (
-    <Input
-      type="date"
-      value={date ? format(date, "yyyy-MM-dd") : ""}
-      onChange={(e) => {
-        const newDate = e.target.value ? new Date(e.target.value) : undefined
-        onSelect(newDate)
-      }}
-      min="1900-01-01"
-      max={new Date().toISOString().split("T")[0]}
-    />
-  )
-}
+
 
 function formatDate(dateString: string | null): string {
   if (!dateString) return ""

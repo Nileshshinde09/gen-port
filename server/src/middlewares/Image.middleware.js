@@ -51,8 +51,8 @@ const setProfileImage = asyncHandler(
                 500,
                 "Something went wrong while storing image in database !"
             )
-            req.body.avatar = uploadedImage._id
-            req.body.avatarURL = uploadedImage.URL
+            req.body.avatar = uploadedImage.URL
+            req.body.avatarId = uploadedImage._id
             next()
         } catch (error) {
             throw new ApiError(

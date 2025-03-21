@@ -236,6 +236,23 @@ class _Auth {
     }
   }
   
+  async removeProfileImage(): Promise<AxiosResponse<any>> {
+    try {
+      const response = await axios.delete(
+        "/api/v1/user/remove-account-image",
+      );
+      
+      return response;
+    } catch (error: any) {
+      console.error(
+        `[Remove Profile Error]: ${error.response?.data?.message || error.message}`
+      );
+      throw new Error(
+        error.response?.data?.message ||
+          "An error occurred while removing profile."
+      );
+    }
+  }
   async generateOTP() {
     try {
       return await axios.post("/api/v1/user/generate-otp");
