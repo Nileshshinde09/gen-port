@@ -9,7 +9,6 @@ import {
   CreatePortfolio,
   Dashboard,
 ConsoleLayout,
-  Documentation,
   Feedback,
   Guest,
   Home,
@@ -133,7 +132,6 @@ const router = createBrowserRouter(
         }
       >
         <Route path="docs/:type/:id" element={<DeployDocs />} />
-        <Route path="docs" element={<Documentation />} />
         <Route path="my-profile" index element={<Profile />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="create-portfolio" element={<CreatePortfolio />} />

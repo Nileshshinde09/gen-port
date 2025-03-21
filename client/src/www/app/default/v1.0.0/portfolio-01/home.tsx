@@ -211,6 +211,7 @@ export default function Home({ portfolio }: { portfolio?: any }) {
   });
   useEffect(() => {
     if (!portfolio) return;
+    console.log("portfolio ::",portfolio)
     setProfileData(portfolio?.user);
     setVisibleFields(portfolio.visibleFields);
   }, [portfolio]);

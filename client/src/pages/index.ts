@@ -12,10 +12,8 @@ import Suppport from "./console/suppport";
 import UpdatePortfolio from "./console/update-portfolio";
 import CreatePortfolio from "./console/create-portfolio";
 import Dashboard from "./console/dashboard";
-import Documentation from "./console/docs/_layout";
 import DeployDocs from "./console/docs/deploy-docs";
 export {
-  Documentation,
   DeployDocs,
   Dashboard,
   CreatePortfolio,

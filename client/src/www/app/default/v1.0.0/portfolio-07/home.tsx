@@ -22,7 +22,48 @@ import {
   Folder,
   ChevronRight,
 } from "lucide-react";
+interface Education {
+  institution: string;
+  degree: string;
+  fieldOfStudy: string;
+  startDate: string;
+  endDate: string;
+  currentlyStudying: boolean;
+  _id: string;
+}
 
+interface Experience {
+  company: string;
+  position: string;
+  startDate: string;
+  endDate: string;
+  currentlyWorking: boolean;
+  description: string;
+  _id: string;
+}
+
+interface Project {
+  name: string;
+  description: string;
+  technologies: string[];
+  socials: string[];
+  repositoryLink: string;
+  liveDemoLink: string;
+  _id: string;
+}
+
+interface profileData {
+  email: string;
+  avatar: string | null;
+  designation: string;
+  location: string;
+  fullName: string;
+  bio: string;
+  skills: string[];
+  education: Education[];
+  experience: Experience[];
+  projects: Project[];
+}
 export default function Home({ portfolio }: { portfolio?: any }) {
   const [darkMode, setDarkMode] = useState(false);
   const [visibleFields, setVisibleFields] = useState({
@@ -38,46 +79,133 @@ export default function Home({ portfolio }: { portfolio?: any }) {
     skills: -1,
     username: -1,
   });
-  const [profileData, setProfileData] = useState({
-    email: "nilesh@gmail.com",
-    avatar: null,
-    designation: "Full Stack Developer",
-    location: "India",
-    fullName: "Nilesh Shinde",
-    bio: "Im nick a full stack web dev.",
-    phone: "+91 9876543210", // Added dummy phone number
-    skills: ["js", "ts", "python"],
-    education: [
-      {
-        institution: "DMS Mandals college of Computer Applications",
-        degree: "BCA",
-        fieldOfStudy: "Computer Applications",
-        startDate: "2021-08-12T18:30:00.000Z",
-        endDate: "2024-07-12T18:30:00.000Z",
-        currentlyStudying: false,
-      },
-    ],
-    experience: [
-      {
-        company: "infosys",
-        position: "junior backend dev",
-        startDate: "2024-08-13T09:47:44.565Z",
-        endDate: "2025-02-10T09:47:44.565Z",
-        currentlyWorking: false,
-        description: "my work involed handling and building graphql api's",
-      },
-    ],
-    projects: [
-      {
-        name: "Gen-port ( A Modern Day portfolio maker )",
-        description: "A Modern Day portfolio maker with modern UI",
-        technologies: ["React.js", "Express.js", "Node.js", "Mongodb"],
-        socials: ["https://github.com/Nileshshinde09"],
-        repositoryLink: "https://github.com/Nileshshinde09",
-        liveDemoLink: "https:",
-      },
-    ],
-  });
+  const [profileData, setProfileData] = useState<profileData>({
+           email: "john.developer@gmail.com",
+           avatar: "https://avatars.githubusercontent.com/u/1234567",
+           designation: "Senior Full Stack Developer",
+           location: "San Francisco, CA",
+           fullName: "John Developer",
+           bio: "Passionate full-stack developer with 5+ years of experience building scalable web applications. Specialized in React, Node.js, and cloud architecture. Currently focused on creating innovative solutions that make a difference in people's lives.",
+           skills: [
+             "JavaScript",
+             "TypeScript",
+             "React.js",
+             "Node.js",
+             "Python",
+             "AWS",
+             "Docker",
+             "MongoDB",
+             "GraphQL",
+             "Next.js",
+             "TailwindCSS",
+             "PostgreSQL",
+           ],
+           education: [
+             {
+               institution: "University of California, Berkeley",
+               degree: "Master of Science",
+               fieldOfStudy: "Computer Science",
+               startDate: "2018-09-01T00:00:00.000Z",
+               endDate: "2020-05-30T00:00:00.000Z",
+               currentlyStudying: false,
+               _id: "1",
+             },
+             {
+               institution: "Stanford University",
+               degree: "Bachelor of Science",
+               fieldOfStudy: "Software Engineering",
+               startDate: "2014-09-01T00:00:00.000Z",
+               endDate: "2018-05-30T00:00:00.000Z",
+               currentlyStudying: false,
+               _id: "2",
+             },
+           ],
+           experience: [
+             {
+               company: "Google",
+               position: "Senior Software Engineer",
+               startDate: "2020-06-01T00:00:00.000Z",
+               endDate: "2024-03-15T00:00:00.000Z",
+               currentlyWorking: true,
+               description:
+                 "Leading a team of 5 engineers in developing and maintaining cloud-based solutions. Implemented microservices architecture that reduced system latency by 40%. Mentored junior developers and conducted technical interviews.",
+               _id: "3",
+             },
+             {
+               company: "Microsoft",
+               position: "Software Engineer",
+               startDate: "2018-07-01T00:00:00.000Z",
+               endDate: "2020-05-30T00:00:00.000Z",
+               currentlyWorking: false,
+               description:
+                 "Developed and maintained core components of Azure cloud services. Collaborated with cross-functional teams to implement new features and improve existing functionality.",
+               _id: "4",
+             },
+             {
+               company: "Amazon",
+               position: "Software Development Engineer",
+               startDate: "2016-06-01T00:00:00.000Z",
+               endDate: "2018-06-30T00:00:00.000Z",
+               currentlyWorking: false,
+               description:
+                 "Worked on AWS Lambda service improvements. Implemented automated testing procedures that reduced bug reports by 30%.",
+               _id: "5",
+             },
+           ],
+           projects: [
+             {
+               name: "CloudScale - Cloud Resource Manager",
+               description:
+                 "An enterprise-level cloud resource management platform that helps organizations optimize their cloud spending and resource allocation. Features include real-time monitoring, cost analysis, and automated scaling.",
+               technologies: [
+                 "React",
+                 "Node.js",
+                 "AWS",
+                 "Terraform",
+                 "GraphQL",
+                 "MongoDB",
+               ],
+               socials: ["https://github.com/johndoe/cloudscale"],
+               repositoryLink: "https://github.com/johndoe/cloudscale",
+               liveDemoLink: "https://cloudscale.demo.com",
+               _id: "6",
+             },
+             {
+               name: "DevConnect - Developer Social Platform",
+               description:
+                 "A social networking platform specifically designed for developers to share code, collaborate on projects, and find mentorship opportunities. Includes features like code sharing, real-time chat, and project matching.",
+               technologies: [
+                 "Next.js",
+                 "TypeScript",
+                 "PostgreSQL",
+                 "Redis",
+                 "Socket.io",
+                 "Docker",
+               ],
+               socials: ["https://github.com/johndoe/devconnect"],
+               repositoryLink: "https://github.com/johndoe/devconnect",
+               liveDemoLink: "https://devconnect.demo.com",
+               _id: "7",
+             },
+             {
+               name: "AI Code Review Assistant",
+               description:
+                 "An AI-powered code review tool that automatically analyzes pull requests, suggests improvements, and helps maintain code quality. Integrates with GitHub and GitLab.",
+               technologies: [
+                 "Python",
+                 "TensorFlow",
+                 "FastAPI",
+                 "React",
+                 "GitHub API",
+                 "Docker",
+               ],
+               socials: ["https://github.com/johndoe/ai-code-review"],
+               repositoryLink: "https://github.com/johndoe/ai-code-review",
+               liveDemoLink: "https://ai-code-review.demo.com",
+               _id: "8",
+             },
+           ],
+         });
   useEffect(() => {
     if (!portfolio) return;
     setProfileData(portfolio?.user);

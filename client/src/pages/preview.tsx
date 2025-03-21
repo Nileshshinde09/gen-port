@@ -26,6 +26,7 @@ const Preview = () => {
       }
     })();
   }, [_id]);
+  
     if (portfolioId === "default-portfolio-01"){
       return (
         <div className="w-full h-full relative">

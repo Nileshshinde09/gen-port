@@ -62,7 +62,7 @@ const Portfolio = () => {
       <div className="w-full h-full relative">
         {metaData && (
           <div
-            className="fixed flex flex-col gap-5 mt-20 absolute z-[9999]">
+            className="fixed flex flex-col gap-5 mt-20 z-[9999]">
             <Button
               onClick={()=>handleAddPortfolio(true)}
               variant={"ghost"}
