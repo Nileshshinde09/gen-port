@@ -4,7 +4,7 @@ import { Input } from "../../components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { signUpSchema } from "../../schema";
 import axios from "axios";
-import { Flower, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { useToast } from "../../hooks/use-toast";
