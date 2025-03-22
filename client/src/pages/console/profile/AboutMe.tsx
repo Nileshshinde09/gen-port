@@ -30,7 +30,7 @@ type BioFormValues = z.infer<typeof bioSchema>;
 
 export function AboutMe() {
   const user = useAppSelector((state: any) => state.user.userData);
-  
+  const [isLoading,setIsLoading]=useState(false)
   const [isEditing, setIsEditing] = useState(false);
   const [bio, setBio] = useState(user?.bio);
   const form = useForm<BioFormValues>({
@@ -44,6 +44,7 @@ export function AboutMe() {
 
   const onSubmit: SubmitHandler<BioFormValues> = async (data) => {
     try {
+      setIsLoading(true)
       const response = await Auth.updateProfile({
         bio: data.bio,
       });
@@ -65,12 +66,14 @@ export function AboutMe() {
         variant: "destructive",
       });
       // Keep the form open if there's an error
+    } finally {
+      setIsLoading(false)
     }
   };
 
   const MotionCard = motion(Card);
 
-  if (!user?.bio) {
+  if (isLoading) {
     return (
       <MotionCard>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

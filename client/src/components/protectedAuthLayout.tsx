@@ -25,7 +25,7 @@ const ProtectedAuthLayout: React.FC<ProtectedAuthLayoutProps> = ({
     let intendedPath = sessionStorage.getItem("intendedPath"); 
     const publicPaths = [
       "/login",
-      "/signup",
+      "/sign-up",
       "/",
       "/guest",
       "/send-forgot-password-mail",

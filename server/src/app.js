@@ -8,7 +8,7 @@ const app = express();
 
 // Create a CORS middleware with your settings
 const corsMiddleware = cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: ["http://localhost:5173", "http://localhost:5174","https://genports.vercel.app","https://gen-port.vercel.app"],
   credentials: true,
 });
 
@@ -25,7 +25,8 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/api/v1/portfolio')) {
     return next();
   }
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173", "http://localhost:5174");
+  res.header("Access-Control-Allow-Origin", ["http://localhost:5173", "http://localhost:5174","https://genports.vercel.app","https://gen-port.vercel.app"
+  ]);
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"

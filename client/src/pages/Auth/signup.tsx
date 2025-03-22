@@ -29,7 +29,7 @@ import { z } from "zod";
 import { Auth } from "@/services";
 import { useAppDispatch } from "@/store/hooks";
 import { setAuthPage } from "@/store/slices/themeSlice";
-import { Icons } from "@/components";
+// import { Icons } from "@/components";
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 const SignUp: React.FC = () => {
@@ -281,9 +281,9 @@ const SignUp: React.FC = () => {
             <Button
               type="submit"
               className="w-full max-w- mt-3"
-              disabled={isSubmitting}
+              disabled={isSubmitting||isLoading}
             >
-              {isSubmitting ? (
+              {isSubmitting||isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Please wait
@@ -299,7 +299,7 @@ const SignUp: React.FC = () => {
               </Link>
             </div>
           </form>
-          <div className="relative space-y-3">
+          {/* <div className="relative space-y-3">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
@@ -321,7 +321,7 @@ const SignUp: React.FC = () => {
               <Flower className=" h-6 w-6 text-rose-500" />
             )}{" "}
             Continue with Guest Account
-          </Button>
+          </Button> */}
         </Form>
       </div>
     </>

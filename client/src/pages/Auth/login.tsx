@@ -1,8 +1,8 @@
-import { Icons } from "@/components";
+// import { Icons } from "@/components";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Flower } from "lucide-react";
+// import { Flower } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
@@ -154,9 +154,9 @@ const Login = () => {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting||isLoading}
                 >
-                  {isSubmitting ? (
+                  {isSubmitting||isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Please wait
@@ -173,7 +173,7 @@ const Login = () => {
                 </Link>
               </div>
             </form>
-            <div className="relative space-y-3">
+            {/* <div className="relative space-y-3">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -195,7 +195,7 @@ const Login = () => {
                 <Flower className=" h-6 w-6 text-rose-500" />
               )}{" "}
               Continue with Guest Account
-            </Button>
+            </Button> */}
           </Form>
         </div>
       </div>
