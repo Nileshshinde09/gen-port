@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import {
   GENDER_TYPE,
+  RESET_FOROGT_PASSWORD_SECURITY_TOKEN_SECRET,
+  RESET_FOROGT_PASSWORD_TOKEN_EXPIRY,
   ACCESS_TOKEN_SECRET,
   ACCESS_TOKEN_EXPIRY,
   REFRESH_TOKEN_SECRET,
@@ -80,7 +82,10 @@ const userSchema = new Schema(
       trim: true,
       index: true,
     },
-
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
     bio: {
       type: String,
       default: null,
@@ -135,7 +140,19 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
-
+userSchema.methods.generateResetPasswordSecurityToken = async function(){
+  return jwt.sign(
+    {
+      _id:this._id,
+      username:this?.username,
+      email:this.email
+    },
+    RESET_FOROGT_PASSWORD_SECURITY_TOKEN_SECRET,
+    {
+      expiresIn:RESET_FOROGT_PASSWORD_TOKEN_EXPIRY,
+    } 
+  )
+}
 // Check if the password is correct
 userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);

@@ -3,8 +3,10 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../model/user.model.js";
 import jwt from "jsonwebtoken";
+import {OTP} from "../model/otp.model.js";
 import {
   ADMIN_EMAILS,
+  EMAIL_OTP_EXPIRY,
   PROFILE_UPDATE_KEY,
   PROFILE_UPDATE_KEY_ENUM,
   REFRESH_TOKEN_SECRET,
@@ -15,7 +17,8 @@ import { faker } from "@faker-js/faker";
 import { v4 as uuidv4 } from "uuid";
 import { removeImageContentFromCloudinary } from "../utils/cloudinary.js";
 import { Images } from "../model/images.model.js";
-
+import { ForgotPassword } from "../model/forgotPassword.js";
+import {emailVerificationContent, forgotPasswordContent, sendMail} from "../utils/mail.js";
 const findUsersByUsername = asyncHandler(async (req, res) => {
   const userId = req?.user?._id;
   const username = req.query?.username;
@@ -667,7 +670,204 @@ const removeProfileImage = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, "Image removed successfully"));
 });
+const validateOTP = asyncHandler(async (req, res) => {
+  try {
+    const userId = req?.user?._id;
+    const incomingOTP = req.body?.otp;
+    if (!userId) throw new ApiError(404, "User Not Found!");
+    if (!incomingOTP) throw new ApiError(404, "OTP Not Found!");
+    if (req?.user?.emailVerified)
+      return res.status(202).json(
+        new ApiResponse(
+          202,
+          {
+            emailVerified: true,
+          },
+          "Already Email Verified"
+        )
+      );
+    const otp = await OTP.findOne({ userId }).sort({ createdAt: -1 });
+    if (!otp) throw new ApiError(404, "Opt not present in database");
+
+    const isExpired = await otp.isOTPExpired();
+    if (isExpired)
+      return res.status(200).json(
+        new ApiResponse(
+          400,
+          {
+            isExpired: true,
+          },
+          "OTP Expired"
+        )
+      );
+    const isCorrect = await otp.isOTPCorrect(incomingOTP);
+    if (!isCorrect)
+      return res.status(200).json(
+        new ApiResponse(
+          400,
+          {
+            isInvalid: true,
+          },
+          "OTP Expired"
+        )
+      );
+
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        isEmailVerified: true,
+      },
+      {
+        new: true,
+      }
+    );
+
+    return res.status(202).json(
+      new ApiResponse(
+        202,
+        {
+          emailVerified: true,
+        },
+        "Email Verified Successfully!"
+      )
+    );
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error?.message || "Something went wrong while validating OTP"
+    );
+  }
+});
+const generateOTP = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) throw new ApiError(404, "User Not Found!");
+    if (req?.user?.emailVerified)
+      return res.status(202).json(
+        new ApiResponse(
+          202,
+          {
+            emailVerified: true,
+          },
+          "Already Email Verified"
+        )
+      );
+    const generateOTP = (length) =>
+      Array.from({ length }, () => Math.floor(Math.random() * 10)).join("");
+    const otp = generateOTP(6);
+    const ExpiryAt = new Date(Date.now() + EMAIL_OTP_EXPIRY * 60 * 1000);
+    const generatedOTP = await OTP.create({
+      userId,
+      otp,
+      ExpiryAt,
+    });
+    if (!generatedOTP)
+      throw new ApiError(500, "Something went wrong while generating OTP");
+    try {
+      const emailContent = emailVerificationContent(
+        req.user?.username,
+        generatedOTP.otp
+      );
+      await sendMail(
+        emailContent,
+        req.user.email,
+        "Prep Next Email Verification OTP"
+      );
+    } catch (error) {
+      throw new ApiError(
+        500,
+        error?.message || "Something went wrong while sending OTP with email"
+      );
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "OTP generated Successfully!"));
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error?.message || "Something went wrong while generating OTP"
+    );
+  }
+});
+const sendResetForgotPasswordEmail = asyncHandler(async (req, res) => {
+  if (!req) throw new ApiError(404, "Request not found !");
+  const { email, passwordResetUrl } = req?.body;
+  if (!email) throw new ApiError(404, "Email Not Found!");
+  const user = await User.findOne({
+    email,
+  });
+  if (!user)
+    return res.status(200).json(new ApiResponse(404, {}, "Email Id not Found"));
+  const token = await user.generateResetPasswordSecurityToken();
+  const URL = `${passwordResetUrl}${token}`;
+  try {
+    const emailContent = forgotPasswordContent(user?.username, URL);
+    await sendMail(
+      emailContent,
+      user.email,
+      "Prep Next Reset Forgot Password Email."
+    );
+    const isUserExist = await ForgotPassword.findOne({
+      userId: user._id,
+    });
+    let forgotPasswordResponse = null;
+    if (!isUserExist) {
+      forgotPasswordResponse = await ForgotPassword.create({
+        userId: user._id,
+        resetPasswordToken: token,
+      });
+    } else {
+      forgotPasswordResponse = await ForgotPassword.findByIdAndUpdate(
+        isUserExist._id,
+        {
+          resetPasswordToken: token,
+        }
+      );
+    }
+    if (forgotPasswordResponse) {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Email Send Successfully !"));
+    }
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error?.message || "Something went wrong while sending OTP with email"
+    );
+  }
+});
+
+const resetForgotPassword = asyncHandler(async (req, res) => {
+  if (!req?.user)
+    throw new ApiError(404, "User Not Found, Unauthorised Request !");
+  const { newPassword } = req.body;
+
+  console.log("newPassword ::", newPassword);
+
+  if (!newPassword) throw new ApiError(404, "New Password Not Found");
+  const user = await User.findById(req.user?._id);
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
+});
+const resetForgotPasswordVerification = asyncHandler(async (req, res) => {
+  if (!req?.user)
+    throw new ApiError(404, "User Not Found, Unauthorised Request!");
+
+  return res
+    .status(200)
+    .clearCookie("resetforgotpasswordToken")
+    .json(new ApiResponse(200, {}, "Page Load Verification Successfully!"));
+});
+
 export {
+  validateOTP,
+generateOTP,
+sendResetForgotPasswordEmail,
+resetForgotPassword,
+resetForgotPasswordVerification,
   updateProfileImage,
   removeProfileImage,
   updateProfile,

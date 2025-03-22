@@ -63,6 +63,7 @@ const OTP: React.FC = () => {
           });
           const user: any = await Auth.getUser();
           if (user?.data?.success) dispatch(login(user?.data?.data));
+          navigate('/console/my-profile');
           dispatch(verifyEmail(true));
         } else if (isInvalid) {
           toast({

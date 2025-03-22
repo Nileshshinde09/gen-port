@@ -14,8 +14,13 @@ import {
   updateProfile,
   updateProfileImage,
   removeProfileImage,
+  generateOTP,
+  validateOTP,
+  resetForgotPassword,
+  sendResetForgotPasswordEmail,
+  resetForgotPasswordVerification,
 } from "../controllers/user.controller.js";
-import { isAdminMiddleware, verifyJWT } from "../middlewares/auth.middleware.js";
+import { isAdminMiddleware, verifyJWT, verifyResetForgotPasswordJWT } from "../middlewares/auth.middleware.js";
 import { updateUserMetrics } from "../middlewares/userMetrics.middleware.js";
 import checkIfBlocked from "../middlewares/block.middleware.js";
 import { setProfileImage } from "../middlewares/Image.middleware.js";
@@ -51,6 +56,16 @@ router.route("/remove-account-image").delete(verifyJWT,checkIfBlocked,removeProf
 router.route("/check-unique-username").get(isUsernameUnique);
 
 router.route("/check-is-admin").get(isAdmin);
+
+router.route("/generate-otp").post(verifyJWT, generateOTP)
+
+router.route("/validate-otp").post(verifyJWT, validateOTP)
+
+router.route("/reset-forgot-password").post(verifyResetForgotPasswordJWT, resetForgotPassword)
+
+router.route("/send-reset-forgot-password-email").post(sendResetForgotPasswordEmail  )
+
+router.route("/reset-forgot-password-page-verification").post(verifyResetForgotPasswordJWT, resetForgotPasswordVerification)
 
 //-----------------------------------admin routes--------------------------------------------------------------------------------------------------
 

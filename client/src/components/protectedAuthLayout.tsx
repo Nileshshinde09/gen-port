@@ -17,15 +17,30 @@ const ProtectedAuthLayout: React.FC<ProtectedAuthLayoutProps> = ({
   const [loader, setLoader] = useState(false);
   const authStatus = useAppSelector((state) => state.user.AuthState) || false;
   const isNavVisible = useAppSelector((state) => state.theme.isNavVisible);
+  const userData = useAppSelector((state)=>state.user.userData)
   const dispatch = useAppDispatch();
   // dispatch(NavDown());
 
   useEffect(() => {
     let intendedPath = sessionStorage.getItem("intendedPath"); 
-  
+    const publicPaths = [
+      "/login",
+      "/signup",
+      "/",
+      "/guest",
+      "/send-forgot-password-mail",
+      "/verify-forgot-password",
+    ];
+    const forgotPasswordPaths = [
+      "/send-forgot-password-mail",
+      "/verify-forgot-password",
+    ];
     if (authentication && !authStatus) {
       // If not authenticated, store intended path & redirect to login
-      if (!["/login", "/sign-up", "/", "/guest"].includes(location.pathname)) {
+      if (
+        !publicPaths.includes(location.pathname) &&
+        !forgotPasswordPaths.includes(location.pathname)
+      ) {
         sessionStorage.setItem("intendedPath", location.pathname);
         navigate("/login", { state: { from: location } });
       }
@@ -37,6 +52,16 @@ const ProtectedAuthLayout: React.FC<ProtectedAuthLayoutProps> = ({
         // Ensure we are not navigating to the same page multiple times
         if (previousPage !== location.pathname) {
           navigate(previousPage, { replace: true });
+        }
+      }
+      if (
+        !userData?.isEmailVerified &&
+        !userData?.isGuest &&
+        location.pathname !== "/otp"
+      ) {
+        // Only redirect to OTP if not already there and not accessing forgot password routes
+        if (!forgotPasswordPaths.includes(location.pathname)) {
+          navigate("/otp", { state: { from: location } });
         }
       }
   

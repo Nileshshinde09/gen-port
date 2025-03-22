@@ -9,11 +9,24 @@ export const REFRESH_TOKEN_SECRET = String(process.env.REFRESH_TOKEN_SECRET);
 export const ACCESS_TOKEN_EXPIRY = String(process.env.ACCESS_TOKEN_EXPIRY);
 export const REFRESH_TOKEN_EXPIRY = String(process.env.REFRESH_TOKEN_EXPIRY);
 
+// -----------Email Values--------------------------------------------------------------
+export const EMAIL_OTP_EXPIRY = Number(process.env.EMAIL_OTP_EXPIRY)
+export const EMAIL_APP_LINK = String(process.env.EMAIL_APP_LINK)
+export const MAILTRAP_SMTP_HOST = String(process.env.MAILTRAP_SMTP_HOST)
+export const MAILTRAP_SMTP_PORT = Number(process.env.MAILTRAP_SMTP_PORT)
+export const MAILTRAP_SMTP_USER = String(process.env.MAILTRAP_SMTP_USER)
+export const MAILTRAP_SMTP_PASS = String(process.env.MAILTRAP_SMTP_PASS)
+export const EMAIL_ID_FOR_MAIL = String(process.env.EMAIL_ID_FOR_MAIL)
+
 //-----------------------------Cloudinary Constants------------------------------------------
 
 export const CLOUDINARY_CLOUD_NAME = String(process.env.CLOUDINARY_CLOUD_NAME)
 export const CLOUDINARY_API_KEY = String(process.env.CLOUDINARY_API_KEY)
 export const CLOUDINARY_API_SECRET = String(process.env.CLOUDINARY_API_SECRET)
+//-----------Reset password token------------------------------------------------------
+export const RESET_PASSWORD_RATELIMITER_REQUEST_COUNT = Number(process.env.RESET_PASSWORD_RATELIMITER_REQUEST_COUNT)
+export const RESET_FOROGT_PASSWORD_SECURITY_TOKEN_SECRET = String(process.env.RESET_FOROGT_PASSWORD_SECURITY_TOKEN_SECRET)
+export const RESET_FOROGT_PASSWORD_TOKEN_EXPIRY = String(process.env.RESET_FOROGT_PASSWORD_TOKEN_EXPIRY)
 
 //----------------------------------------------------------------------------------------
 export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")

@@ -130,8 +130,6 @@ const VerifyForgotPassword: React.FC<VerifyForgotPasswordProps> = () => {
     }
 
     return (
-        <div className="lg:p-8">
-          <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid gap-2 text-center">
@@ -207,8 +205,6 @@ const VerifyForgotPassword: React.FC<VerifyForgotPasswordProps> = () => {
                 </div>
             </form>
         </Form>
-        </div>
-        </div>
     );
 };
 
